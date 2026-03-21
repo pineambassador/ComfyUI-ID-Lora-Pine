@@ -422,37 +422,34 @@ class IDLoRASeparateLatent:
     CATEGORY = "IDLoRA"
 
     def separate(self, combined_latent):
-        import torch
-        samples = combined_latent.get("samples") 
-        
-        # 1. Video stays 5D
-        video_samples = samples[0:1, ...] 
-        
-        # 2. Audio Latent Correction
-        audio_raw = samples[1:2, ...] # [1, 128, 16, 26, 20]
-        b, c, f, h, w = audio_raw.shape
-        
-        # We need to flatten the spatial/temporal dims but KEEP 
-        # the channel dim (128) in the position the VAE expects it.
-        # Permute moves Channels to the last dimension momentarily, 
-        # or we keep it at dim 1 and ensure the rest are 1s.
-        
-        total_length = f * h * w
-        
-        # Instead of putting all data in the 4th dim, we put it in the 3rd 
-        # and keep the 4th dim as size 1. This often fixes broadcasting 
-        # when the weights are applied to Dim 1.
-        audio_samples = audio_raw.reshape(b, c, total_length, 1) 
+    import torch
+    samples = combined_latent.get("samples") # [2, 128, 16, 26, 20]
+    
+    # 1. Video stays 5D - take the first batch, all 128 channels
+    video_samples = samples[0:1, ...] # [1, 128, 16, 26, 20]
+    
+    # 2. Audio Latent Correction
+    # We take the second batch [1:2], but we MUST slice the channels
+    # to only take the first 8 channels that the Audio VAE expects.
+    audio_raw = samples[1:2, 0:8, ...] # [1, 8, 16, 26, 20] <--- THE FIX
+    
+    b, c, f, h, w = audio_raw.shape
+    total_length = f * h * w
+    
+    # LTX Audio VAEs often expect [Batch, Channels, Length, 1] 
+    # or [Batch, Channels, Height, Width]
+    # Given your error expected [1, 8, 8322, 3], let's match that spatial target
+    audio_samples = audio_raw.reshape(b, c, total_length, 1) 
 
-        video_out = {"samples": video_samples}
-        audio_out = {"samples": audio_samples}
+    video_out = {"samples": video_samples}
+    audio_out = {"samples": audio_samples}
 
-        if "noise_mask" in combined_latent:
-            mask = combined_latent["noise_mask"]
-            if mask is not None and torch.is_tensor(mask):
-                video_out["noise_mask"] = mask[0:1, ...]
-        
-        return (video_out, audio_out)
+    if "noise_mask" in combined_latent:
+        mask = combined_latent["noise_mask"]
+        if mask is not None and torch.is_tensor(mask):
+            video_out["noise_mask"] = mask[0:1, ...]
+    
+    return (video_out, audio_out)
 
 
 class IDLoRAPromptFormatter:
