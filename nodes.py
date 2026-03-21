@@ -423,26 +423,31 @@ class IDLoRASeparateLatent:
 
     def separate(self, combined_latent):
         import torch
-        samples = combined_latent.get("samples") # [2, 128, 16, 26, 20]
+        import torch.nn.functional as F
+        samples = combined_latent.get("samples") 
         
-        # 1. Video: Take the first batch [0:1], all 128 channels
+        # 1. Video: All good here
         video_samples = samples[0:1, ...] 
         
-        # 2. Audio: Take the second batch [1:2], but slice ONLY the first 8 channels
-        # LTX Audio VAE weights are [512, 8, 3, 3], so it strictly needs c=8
-        audio_raw = samples[1:2, 0:8, ...] # Result: [1, 8, 16, 26, 20]
+        # 2. Audio: Slice the 8 channels, then PAD back to 128
+        # Take the second batch, first 8 channels
+        audio_8ch = samples[1:2, 0:8, ...] # [1, 8, 16, 26, 20]
         
-        b, c, f, h, w = audio_raw.shape
+        # Pad channels (dim 1) from 8 to 128
+        # pad format is (left, right, top, bottom, front, back, etc) for spatial,
+        # but for specific dims we can use a simpler approach:
+        padding = (0, 0, 0, 0, 0, 0, 0, 120) # Pads the 2nd dimension (channels)
+        audio_128ch = F.pad(audio_8ch, padding) # Result: [1, 128, 16, 26, 20]
+        
+        b, c, f, h, w = audio_128ch.shape
         total_length = f * h * w
         
-        # Reshape to the 4D format the LTX Audio VAE expects
-        # We target [1, 8, length, 1] to satisfy the (B, C, H, W) conv2d input
-        audio_samples = audio_raw.reshape(b, c, total_length, 1) 
+        # Keep the 128 channels, reshape for the VAE
+        audio_samples = audio_128ch.reshape(b, c, total_length, 1) 
 
         video_out = {"samples": video_samples}
         audio_out = {"samples": audio_samples}
 
-        # Handle mask if it exists (usually mirrors the video batch)
         if "noise_mask" in combined_latent:
             mask = combined_latent["noise_mask"]
             if mask is not None and torch.is_tensor(mask):
