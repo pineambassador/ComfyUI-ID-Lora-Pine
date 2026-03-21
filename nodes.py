@@ -209,45 +209,35 @@ class IDLoRAPromptFormatter:
         
         return (pos, negative_prompt)
 
-class IDLoRAEmptyAudioLatent:
+class IDLoRAAudioNoiseInjector:
     @classmethod
     def INPUT_TYPES(s):
         return {
             "required": {
-                "frame_count": ("INT", {"default": 17, "min": 1, "max": 4096}),
+                "samples": ("LATENT",), # Output from the official LTX Empty Audio Node
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                "strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
             }
         }
 
     RETURN_TYPES = ("LATENT",)
-    FUNCTION = "generate"
+    FUNCTION = "inject_noise"
     CATEGORY = "ID-LoRA/Audio"
 
-    def generate(self, frame_count, seed):
-        # LTX2.3 / LTXAV Architectural Constants
-        batch_size = 1
-        channels = 8
-        height = 1
-        width = 1
+    def inject_noise(self, samples, seed, strength):
+        s = samples.copy()
+        audio_tensor = s["samples"]
         
-        # LTXAV Timing: 8 audio latent steps per 1 video frame
-        target_audio_len = frame_count * 8 
-        
-        # Create the starting noise
+        # Match the shape exactly to whatever LTX provided
         torch.manual_seed(seed)
-        samples = torch.randn((batch_size, channels, target_audio_len, height, width))
+        noise = torch.randn_like(audio_tensor)
         
-        # FIX: Squeeze out the H and W dimensions so the patchifier is happy
-        # This changes shape from [1, 8, T, 1, 1] -> [1, 8, T]
-        # Depending on the specific LTX implementation, it may need to be 4D: [1, 8, T, 1]
-        # We will squeeze the last two to be safe:
-        samples = samples.squeeze(-1).squeeze(-1) 
+        # If strength is 1.0, it's a pure blank canvas. 
+        # If lower, it blends with the input (useful for img2vid style audio)
+        s["samples"] = (audio_tensor * (1.0 - strength)) + (noise * strength)
             
-        return ({
-            "samples": samples, 
-            "sample_rate": 24000, 
-            "type": "audio" 
-        },)
+        return (s,)
+
 
 NODE_CLASS_MAPPINGS = {
     "IDLoRAAudioPreprocessor": IDLoRAAudioPreprocessor,
@@ -256,7 +246,7 @@ NODE_CLASS_MAPPINGS = {
     "IDLoRAConditioningSetAudio": IDLoRAConditioningSetAudio,
     "IDLoRAGuider": IDLoRAGuider,
     "IDLoRAPromptFormatter": IDLoRAPromptFormatter,
-    "IDLoRAEmptyAudioLatent": IDLoRAEmptyAudioLatent,
+    "IDLoRAAudioNoiseInjector": IDLoRAAudioNoiseInjector,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {}
