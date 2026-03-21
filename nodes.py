@@ -425,31 +425,31 @@ class IDLoRASeparateLatent:
         import torch
         import torch.nn.functional as F
         
-        # Get the samples [2, 128, 16, 26, 20]
-        samples = combined_latent.get("samples")
+        samples = combined_latent.get("samples") 
         
-        # 1. Video: Standard first batch, all channels
-        video_out = {"samples": samples[0:1, ...]}
+        # --- DIAGNOSTIC PRINTS ---
+        print(f"\n[IDLoRA DEBUG] Original Samples Shape: {samples.shape}")
         
-        # 2. Audio: The 8-channel extraction
-        # We take the second batch [1:2] and ONLY the first 8 channels [0:8]
-        audio_raw = samples[1:2, 0:8, ...] # Result: [1, 8, 16, 26, 20]
+        # 1. Video: Standard first batch
+        video_samples = samples[0:1, ...] 
+        
+        # 2. Audio: Force the slice to 8 channels
+        audio_raw = samples[1:2, 0:8, ...] 
+        print(f"[IDLoRA DEBUG] Sliced Audio Shape: {audio_raw.shape}")
         
         b, c, f, h, w = audio_raw.shape
         total_length = f * h * w
         
-        # Reshape to 4D: [Batch, Channels, Length, 1]
+        # Reshape and Pad to hit that 8322 x 3 target
         audio_flat = audio_raw.reshape(b, c, total_length, 1) # [1, 8, 8320, 1]
-        
-        # 3. Padding for the "8322" and "3" requirement
-        # The error expects [1, 8, 8322, 3]
-        # We need to pad the 3rd dim (Length) by 2 and the 4th dim (Width) by 2
-        # F.pad format is (left, right, top, bottom) -> (W_left, W_right, H_top, H_bottom)
         audio_samples = F.pad(audio_flat, (0, 2, 0, 2)) # [1, 8, 8322, 3]
         
+        print(f"[IDLoRA DEBUG] Final Audio Out Shape: {audio_samples.shape}\n")
+        # -------------------------
+
+        video_out = {"samples": video_samples}
         audio_out = {"samples": audio_samples}
 
-        # Mask handling
         if "noise_mask" in combined_latent:
             mask = combined_latent["noise_mask"]
             if mask is not None and torch.is_tensor(mask):
