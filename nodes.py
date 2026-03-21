@@ -430,26 +430,26 @@ class IDLoRASeparateLatent:
         video_samples = samples[0:1, ...] 
         
         # 2. Audio Latent Correction
+        # Input is [1, 128, 16, 26, 20] -> [B, C, F, H, W]
         audio_raw = samples[1:2, ...]
         b, c, f, h, w = audio_raw.shape
         
-        # LTX Audio VAE expects [Batch, Channels, Total_Length]
-        # Total_Length = Frames * Height * Width
-        # We must permute to ensure C remains the second dimension 
-        # after we flatten the spatial/temporal dims.
+        # The VAE expects [B, C, Time, Freq]
+        # It specifically calls latents.shape[3] to get the frequency.
+        # We need to combine Height and Width but keep them as the 4th dim.
         
-        # Flatten F, H, and W into one dimension
-        audio_samples = audio_raw.reshape(b, c, f * h * w) 
+        # NEW LOGIC: Flatten H*W into the last dimension, keeping F as the 3rd dim.
+        # Resulting shape: [1, 128, 16, 520]
+        audio_samples = audio_raw.reshape(b, c, f, h * w)
 
         video_out = {"samples": video_samples}
         audio_out = {"samples": audio_samples}
 
-        # 3. Handle Mask (Safe version - Video only)
+        # 3. Handle Mask
         if "noise_mask" in combined_latent:
             mask = combined_latent["noise_mask"]
             if mask is not None and torch.is_tensor(mask):
                 video_out["noise_mask"] = mask[0:1, ...]
-                # We leave audio_out["noise_mask"] empty to avoid the unpack error
 
         print(f"DEBUG [Splitter]: Video Shape: {video_samples.shape}")
         print(f"DEBUG [Splitter]: Audio Shape: {audio_samples.shape}")
