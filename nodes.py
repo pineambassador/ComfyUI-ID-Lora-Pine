@@ -214,8 +214,7 @@ class IDLoRAEmptyAudioLatent:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "reference_latent": ("LATENT",), # The identity reference
-                "frame_count": ("INT", {"default": 17, "min": 1, "max": 4096}), # Same as video
+                "frame_count": ("INT", {"default": 17, "min": 1, "max": 4096}),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
             }
         }
@@ -224,22 +223,26 @@ class IDLoRAEmptyAudioLatent:
     FUNCTION = "generate"
     CATEGORY = "ID-LoRA/Audio"
 
-    def generate(self, reference_latent, frame_count, seed):
-        # reference_latent: [B, C, T, H, W]
-        ref_samples = reference_latent["samples"]
-        b, c, _, h, w = ref_samples.shape 
+    def generate(self, frame_count, seed):
+        # LTX2.3 / LTXAV Architectural Constants
+        # These values are fixed for the LTXAV DiT structure
+        batch_size = 1
+        channels = 8
+        height = 1
+        width = 1
         
-        # LTXAV Standard: 8 audio latent entries per 1 video frame
+        # LTXAV Timing: 8 audio latent steps per 1 video frame
+        # This ensures the 24kHz audio stays synced with the 24fps video
         target_audio_len = frame_count * 8 
         
+        # Create the starting noise (The Blank Canvas)
         torch.manual_seed(seed)
-        # We keep H and W at 1x1 from the reference to prevent spatial scrambling
-        new_samples = torch.randn((b, c, target_audio_len, h, w), device=ref_samples.device)
+        samples = torch.randn((batch_size, channels, target_audio_len, height, width))
             
         return ({
-            "samples": new_samples, 
-            "sample_rate": reference_latent.get("sample_rate", 24000),
-            "type": "audio"
+            "samples": samples, 
+            "sample_rate": 24000, 
+            "type": "audio" # Crucial for Native LTX Separate to identify the stream
         },)
 
 NODE_CLASS_MAPPINGS = {
