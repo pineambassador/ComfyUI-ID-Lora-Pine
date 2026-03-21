@@ -430,14 +430,16 @@ class IDLoRASeparateLatent:
         video_samples = samples[0:1, ...] 
         
         # 2. Audio Latent Correction
-        # Input is [1, 128, 16, 26, 20] -> [B, C, F, H, W]
         audio_raw = samples[1:2, ...]
         b, c, f, h, w = audio_raw.shape
         
-        # We need to flatten H and W into a single sequence dimension 
-        # while keeping C (128) as the channel count.
-        # The decoder expects: [B, C, F, L] where L = H * W
-        audio_samples = audio_raw.view(b, c, f, h * w)
+        # LTX Audio VAE expects [Batch, Channels, Total_Length]
+        # Total_Length = Frames * Height * Width
+        # We must permute to ensure C remains the second dimension 
+        # after we flatten the spatial/temporal dims.
+        
+        # Flatten F, H, and W into one dimension
+        audio_samples = audio_raw.reshape(b, c, f * h * w) 
 
         video_out = {"samples": video_samples}
         audio_out = {"samples": audio_samples}
