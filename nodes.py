@@ -225,24 +225,28 @@ class IDLoRAEmptyAudioLatent:
 
     def generate(self, frame_count, seed):
         # LTX2.3 / LTXAV Architectural Constants
-        # These values are fixed for the LTXAV DiT structure
         batch_size = 1
         channels = 8
         height = 1
         width = 1
         
         # LTXAV Timing: 8 audio latent steps per 1 video frame
-        # This ensures the 24kHz audio stays synced with the 24fps video
         target_audio_len = frame_count * 8 
         
-        # Create the starting noise (The Blank Canvas)
+        # Create the starting noise
         torch.manual_seed(seed)
         samples = torch.randn((batch_size, channels, target_audio_len, height, width))
+        
+        # FIX: Squeeze out the H and W dimensions so the patchifier is happy
+        # This changes shape from [1, 8, T, 1, 1] -> [1, 8, T]
+        # Depending on the specific LTX implementation, it may need to be 4D: [1, 8, T, 1]
+        # We will squeeze the last two to be safe:
+        samples = samples.squeeze(-1).squeeze(-1) 
             
         return ({
             "samples": samples, 
             "sample_rate": 24000, 
-            "type": "audio" # Crucial for Native LTX Separate to identify the stream
+            "type": "audio" 
         },)
 
 NODE_CLASS_MAPPINGS = {
