@@ -423,7 +423,7 @@ class IDLoRASeparateLatent:
 
     def separate(self, combined_latent):
         import torch
-        samples = combined_latent.get("samples") # [2, 128, 16, 26, 20]
+        samples = combined_latent.get("samples") 
         
         # 1. Video stays 5D
         video_samples = samples[0:1, ...] 
@@ -432,17 +432,21 @@ class IDLoRASeparateLatent:
         audio_raw = samples[1:2, ...] # [1, 128, 16, 26, 20]
         b, c, f, h, w = audio_raw.shape
         
-        # TARGET SHAPE: [Batch, Channels, Dummy, Total_Length]
-        # This gives the VAE its 4 dimensions, but puts all data in one spot
-        # so the 128 channels can broadcast correctly.
+        # We need to flatten the spatial/temporal dims but KEEP 
+        # the channel dim (128) in the position the VAE expects it.
+        # Permute moves Channels to the last dimension momentarily, 
+        # or we keep it at dim 1 and ensure the rest are 1s.
         
-        total_length = f * h * w # 66560
-        audio_samples = audio_raw.reshape(b, c, 1, total_length) 
+        total_length = f * h * w
+        
+        # Instead of putting all data in the 4th dim, we put it in the 3rd 
+        # and keep the 4th dim as size 1. This often fixes broadcasting 
+        # when the weights are applied to Dim 1.
+        audio_samples = audio_raw.reshape(b, c, total_length, 1) 
 
         video_out = {"samples": video_samples}
         audio_out = {"samples": audio_samples}
 
-        # 3. Handle Mask
         if "noise_mask" in combined_latent:
             mask = combined_latent["noise_mask"]
             if mask is not None and torch.is_tensor(mask):
