@@ -423,24 +423,21 @@ class IDLoRASeparateLatent:
 
     def separate(self, combined_latent):
         import torch
-
-        samples = combined_latent.get("samples")
+        samples = combined_latent.get("samples") # [2, 128, 16, 26, 20]
         
-        # 1. Video stays 5D: [1, 128, 16, 26, 20]
+        # 1. Video stays 5D
         video_samples = samples[0:1, ...] 
         
         # 2. Audio Latent Correction
-        # Input is [1, 128, 16, 26, 20] -> [B, C, F, H, W]
-        audio_raw = samples[1:2, ...]
+        audio_raw = samples[1:2, ...] # [1, 128, 16, 26, 20]
         b, c, f, h, w = audio_raw.shape
         
-        # The VAE expects [B, C, Time, Freq]
-        # It specifically calls latents.shape[3] to get the frequency.
-        # We need to combine Height and Width but keep them as the 4th dim.
+        # TARGET SHAPE: [Batch, Channels, Dummy, Total_Length]
+        # This gives the VAE its 4 dimensions, but puts all data in one spot
+        # so the 128 channels can broadcast correctly.
         
-        # NEW LOGIC: Flatten H*W into the last dimension, keeping F as the 3rd dim.
-        # Resulting shape: [1, 128, 16, 520]
-        audio_samples = audio_raw.reshape(b, c, f, h * w)
+        total_length = f * h * w # 66560
+        audio_samples = audio_raw.reshape(b, c, 1, total_length) 
 
         video_out = {"samples": video_samples}
         audio_out = {"samples": audio_samples}
@@ -450,9 +447,6 @@ class IDLoRASeparateLatent:
             mask = combined_latent["noise_mask"]
             if mask is not None and torch.is_tensor(mask):
                 video_out["noise_mask"] = mask[0:1, ...]
-
-        print(f"DEBUG [Splitter]: Video Shape: {video_samples.shape}")
-        print(f"DEBUG [Splitter]: Audio Shape: {audio_samples.shape}")
         
         return (video_out, audio_out)
 
