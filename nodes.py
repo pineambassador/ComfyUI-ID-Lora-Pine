@@ -53,21 +53,39 @@ class IDLoRAPrepareVideo:
             "required": {
                 "video_latent": ("LATENT",),
                 "first_frame_ref": ("LATENT",),
-                "strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0}),
+                "strength": ("FLOAT", {"default": 0.85, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "mask_strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
             }
         }
     RETURN_TYPES = ("LATENT",)
     FUNCTION = "prepare"
     CATEGORY = "ID-LoRA/Video"
 
-    def prepare(self, video_latent, first_frame_ref, strength):
+    def prepare(self, video_latent, first_frame_ref, strength, mask_strength):
         v = video_latent["samples"].clone()
         ref = first_frame_ref["samples"].clone()
-        if ref.dim() == 5: ref = ref.squeeze(2)
+        
+        if ref.dim() == 5: 
+            ref = ref.squeeze(2)
+        
         if v.shape[-2:] != ref.shape[-2:]:
             ref = F.interpolate(ref, size=v.shape[-2:], mode="bilinear")
-        v[:, :, 0, :, :] = ref * strength + v[:, :, 0, :, :] * (1.0 - strength)
-        return ({"samples": v},)
+        
+        # 1. First Frame Injection (The Identity Anchor)
+        target_noise = v[:, :, 0, :, :]
+        # Blending math from your original fix to prevent washed-out frames
+        v[:, :, 0, :, :] = (ref * strength) + (target_noise * (1.0 - strength))
+        
+        # 2. Noise Mask Generation
+        # We create a mask that is '1' (protected) for the first frame 
+        # and '0' (full noise) for all subsequent frames.
+        b, c, f, h, w = v.shape
+        mask = torch.zeros((b, 1, f, h, w), device=v.device)
+        
+        # Protect the first frame based on mask_strength
+        mask[:, :, 0, :, :] = mask_strength 
+        
+        return ({"samples": v, "noise_mask": mask},)
 
 # --- ID-LORA CONDITIONING & GUIDER ---
 
@@ -191,6 +209,39 @@ class IDLoRAPromptFormatter:
         
         return (pos, negative_prompt)
 
+class IDLoRAEmptyAudioLatent:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "reference_latent": ("LATENT",), # The identity reference
+                "frame_count": ("INT", {"default": 17, "min": 1, "max": 4096}), # Same as video
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+            }
+        }
+
+    RETURN_TYPES = ("LATENT",)
+    FUNCTION = "generate"
+    CATEGORY = "ID-LoRA/Audio"
+
+    def generate(self, reference_latent, frame_count, seed):
+        # reference_latent: [B, C, T, H, W]
+        ref_samples = reference_latent["samples"]
+        b, c, _, h, w = ref_samples.shape 
+        
+        # LTXAV Standard: 8 audio latent entries per 1 video frame
+        target_audio_len = frame_count * 8 
+        
+        torch.manual_seed(seed)
+        # We keep H and W at 1x1 from the reference to prevent spatial scrambling
+        new_samples = torch.randn((b, c, target_audio_len, h, w), device=ref_samples.device)
+            
+        return ({
+            "samples": new_samples, 
+            "sample_rate": reference_latent.get("sample_rate", 24000),
+            "type": "audio"
+        },)
+
 NODE_CLASS_MAPPINGS = {
     "IDLoRAAudioPreprocessor": IDLoRAAudioPreprocessor,
     "IDLoRAAudioVAEEncode": IDLoRAAudioVAEEncode,
@@ -198,6 +249,7 @@ NODE_CLASS_MAPPINGS = {
     "IDLoRAConditioningSetAudio": IDLoRAConditioningSetAudio,
     "IDLoRAGuider": IDLoRAGuider,
     "IDLoRAPromptFormatter": IDLoRAPromptFormatter,
+    "IDLoRAEmptyAudioLatent": IDLoRAEmptyAudioLatent,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {}
