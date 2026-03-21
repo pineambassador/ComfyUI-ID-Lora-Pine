@@ -424,30 +424,32 @@ class IDLoRASeparateLatent:
     def separate(self, combined_latent):
         import torch
         import torch.nn.functional as F
-        samples = combined_latent.get("samples") 
         
-        # 1. Video: All good here
-        video_samples = samples[0:1, ...] 
+        # Get the samples [2, 128, 16, 26, 20]
+        samples = combined_latent.get("samples")
         
-        # 2. Audio: Slice the 8 channels, then PAD back to 128
-        # Take the second batch, first 8 channels
-        audio_8ch = samples[1:2, 0:8, ...] # [1, 8, 16, 26, 20]
+        # 1. Video: Standard first batch, all channels
+        video_out = {"samples": samples[0:1, ...]}
         
-        # Pad channels (dim 1) from 8 to 128
-        # pad format is (left, right, top, bottom, front, back, etc) for spatial,
-        # but for specific dims we can use a simpler approach:
-        padding = (0, 0, 0, 0, 0, 0, 0, 120) # Pads the 2nd dimension (channels)
-        audio_128ch = F.pad(audio_8ch, padding) # Result: [1, 128, 16, 26, 20]
+        # 2. Audio: The 8-channel extraction
+        # We take the second batch [1:2] and ONLY the first 8 channels [0:8]
+        audio_raw = samples[1:2, 0:8, ...] # Result: [1, 8, 16, 26, 20]
         
-        b, c, f, h, w = audio_128ch.shape
+        b, c, f, h, w = audio_raw.shape
         total_length = f * h * w
         
-        # Keep the 128 channels, reshape for the VAE
-        audio_samples = audio_128ch.reshape(b, c, total_length, 1) 
-
-        video_out = {"samples": video_samples}
+        # Reshape to 4D: [Batch, Channels, Length, 1]
+        audio_flat = audio_raw.reshape(b, c, total_length, 1) # [1, 8, 8320, 1]
+        
+        # 3. Padding for the "8322" and "3" requirement
+        # The error expects [1, 8, 8322, 3]
+        # We need to pad the 3rd dim (Length) by 2 and the 4th dim (Width) by 2
+        # F.pad format is (left, right, top, bottom) -> (W_left, W_right, H_top, H_bottom)
+        audio_samples = F.pad(audio_flat, (0, 2, 0, 2)) # [1, 8, 8322, 3]
+        
         audio_out = {"samples": audio_samples}
 
+        # Mask handling
         if "noise_mask" in combined_latent:
             mask = combined_latent["noise_mask"]
             if mask is not None and torch.is_tensor(mask):
