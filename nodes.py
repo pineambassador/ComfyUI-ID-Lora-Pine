@@ -425,29 +425,30 @@ class IDLoRASeparateLatent:
         import torch
         import torch.nn.functional as F
         
-        samples = combined_latent.get("samples") 
+        samples = combined_latent.get("samples") # [2, 128, 16, 26, 20]
         
-        # --- DIAGNOSTIC PRINTS ---
-        print(f"\n[IDLoRA DEBUG] Original Samples Shape: {samples.shape}")
+        # 1. Video
+        video_out = {"samples": samples[0:1, ...]}
         
-        # 1. Video: Standard first batch
-        video_samples = samples[0:1, ...] 
+        # 2. Audio: Slice 8, then Pad to 128 Channels
+        audio_8ch = samples[1:2, 0:8, ...] 
         
-        # 2. Audio: Force the slice to 8 channels
-        audio_raw = samples[1:2, 0:8, ...] 
-        print(f"[IDLoRA DEBUG] Sliced Audio Shape: {audio_raw.shape}")
+        # Pad channels from 8 -> 128 (this is dim 1)
+        # padding tuple: (W_left, W_right, H_top, H_bottom, F_front, F_back, C_left, C_right)
+        audio_128ch = F.pad(audio_8ch, (0, 0, 0, 0, 0, 0, 0, 120)) 
         
-        b, c, f, h, w = audio_raw.shape
-        total_length = f * h * w
+        b, c, f, h, w = audio_128ch.shape
+        total_length = f * h * w # 8320
         
-        # Reshape and Pad to hit that 8322 x 3 target
-        audio_flat = audio_raw.reshape(b, c, total_length, 1) # [1, 8, 8320, 1]
-        audio_samples = F.pad(audio_flat, (0, 2, 0, 2)) # [1, 8, 8322, 3]
+        # 3. Reshape and Pad Length to 8322
+        # We keep Width at 1 because 3 * 8 was giving us that weird 24
+        audio_flat = audio_128ch.reshape(b, c, total_length, 1) 
         
-        print(f"[IDLoRA DEBUG] Final Audio Out Shape: {audio_samples.shape}\n")
-        # -------------------------
+        # Pad only the Length (dim 2) to 8322
+        audio_samples = F.pad(audio_flat, (0, 0, 0, 2)) # [1, 128, 8322, 1]
+        
+        print(f"[IDLoRA DEBUG] Final Audio Out Shape: {audio_samples.shape}")
 
-        video_out = {"samples": video_samples}
         audio_out = {"samples": audio_samples}
 
         if "noise_mask" in combined_latent:
