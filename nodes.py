@@ -51,45 +51,58 @@ class IDLoRAPrepareVideo:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "video_latent": ("LATENT",),
+                "latent_video": ("LATENT",),
                 "first_frame_ref": ("LATENT",),
-                "strength": ("FLOAT", {"default": 0.85, "min": 0.0, "max": 1.0, "step": 0.01}),
-                "mask_strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
             }
         }
+
     RETURN_TYPES = ("LATENT",)
     FUNCTION = "prepare"
     CATEGORY = "ID-LoRA/Video"
 
-    def prepare(self, video_latent, first_frame_ref, strength, mask_strength):
-        v = video_latent["samples"].clone()
+    def prepare(self, latent_video, first_frame_ref, strength):
+        v = latent_video["samples"].clone()
         ref = first_frame_ref["samples"].clone()
         
-        if ref.dim() == 5: 
-            ref = ref.squeeze(2)
+        # --- 1. LTXV LATENT SCALING (The "Noise" Fix) ---
+        # LTX2.3 expects latents in a specific range. 0.18215 is the standard.
+        v = v * 0.18215
+        ref = ref * 0.18215
+
+        # --- 2. DIMENSION SANITY CHECK ---
+        if v.dim() == 4: v = v.unsqueeze(0) # [B, C, F, H, W]
+        if ref.dim() == 4: ref = ref.unsqueeze(0)
         
-        if v.shape[-2:] != ref.shape[-2:]:
-            ref = F.interpolate(ref, size=v.shape[-2:], mode="bilinear")
+        B, C, F, H, W = v.shape
         
-        # 1. First Frame Injection (The Identity Anchor)
-        target_noise = v[:, :, 0, :, :]
-        # Blending math from your original fix to prevent washed-out frames
-        v[:, :, 0, :, :] = (ref * strength) + (target_noise * (1.0 - strength))
-        
-        # 2. Noise Mask Generation
-        # We create a mask that is '1' (protected) for the first frame 
-        # and '0' (full noise) for all subsequent frames.
-        b, c, f, h, w = v.shape
-        mask = torch.zeros((b, 1, f, h, w), device=v.device)
-        
-        # Protect the first frame based on mask_strength
-        mask[:, :, 0, :, :] = mask_strength 
-        
-        # Add the "type" key so the Sampler/Separator knows this is Video data
+        # --- 3. FIRST FRAME INJECTION (The "Perfect Video" Secret) ---
+        try:
+            # If ref has a temporal dim, squeeze it to get the single image frame
+            if ref.dim() == 5: ref = ref.squeeze(2) 
+            
+            # Ensure spatial alignment (Match Latent H/W)
+            if v.shape[-2:] != ref.shape[-2:]:
+                ref = torch.nn.functional.interpolate(ref, size=v.shape[-2:], mode="bilinear")
+            
+            # Inject the reference into the first frame (Index 0)
+            # We blend it based on strength to allow for some flexibility
+            v[:, :, 0, :, :] = (ref * strength) + (v[:, :, 0, :, :] * (1.0 - strength))
+            
+            # --- 4. NOISE MASKING ---
+            # Create a mask that tells the sampler: "Don't change frame 0 much"
+            mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
+            mask[:, :, 0, :, :] = 0.0  # 0.0 means "Keep this exactly as provided"
+            
+        except Exception as e:
+            print(f"IDLoRA Prepare Error: {e}")
+            mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
+
+        # --- 5. LTXV METADATA ---
         return ({
             "samples": v, 
             "noise_mask": mask,
-            "type": "video"  # This is the "Passport" the LTXAV Sampler checks
+            "type": "video" # CRITICAL for LTXAV Sampler
         },)
 
 # --- ID-LORA CONDITIONING & GUIDER ---
