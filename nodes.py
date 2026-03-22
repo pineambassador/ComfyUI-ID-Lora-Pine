@@ -71,6 +71,7 @@ class IDLoRAPrepareVideo:
         B, C, F, H, W = v.shape
         
         try:
+            # Scaling for LTX2.3 Transformer
             ref_std = torch.std(ref).item()
             if ref_std < 0.5:
                 ref = ref / 0.18215
@@ -78,40 +79,55 @@ class IDLoRAPrepareVideo:
             f_ref_count = ref.shape[2] if ref.dim() == 5 else 1
             mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
 
-            # --- 2. THE HARD ANCHOR (Frame 0) ---
+            # --- 2. THE NATIVE INVERSE CALCULATIONS ---
+            # LTX native logic: Mask = 1.0 - Strength. 
+            # If strength is 0.9, the 'Permission' to change pixels is 0.1.
+            base_permission = 1.0 - strength
+
+            # --- 3. KEYFRAME INJECTION ---
             for i in range(f_ref_count):
                 if i < F:
                     current_f = ref[:, :, i, :, :] if ref.dim() == 5 else ref.squeeze(2)
                     if v.shape[-2:] != current_f.shape[-2:]:
                         current_f = torch.nn.functional.interpolate(current_f, size=v.shape[-2:], mode="bilinear")
+                    
+                    # Inject at FULL slider strength
                     v[:, :, i, :, :] = (current_f * strength) + (v[:, :, i, :, :] * (1.0 - strength))
+                    # Hard lock the keyframes (Native logic uses 0.0 for fixed frames)
                     mask[:, :, i, :, :] = 0.0 
 
-            # --- 3. THE PROTECTED ZONE (The Anti-Jump-Cut) ---
-            ref_img = ref.squeeze(2) if ref.dim() == 4 else ref[:, :, 0, :, :]
-            # We protect frame 0 to 12 (roughly 1 second of video)
-            protected_zone = min(F // 2, 12) 
-            
-            for i in range(f_ref_count, F):
-                # Reduced noise floor to allow the ID to breathe
-                frame_noise = torch.randn((B, C, H, W), device=v.device, dtype=v.dtype) * 0.4
+            # --- 4. THE TEMPORAL LEASH (Using Native Scaling) ---
+            if f_ref_count == 1 and F > 1:
+                ref_img = ref.squeeze(2)
+                # We protect the first 8-12 frames (The 'Jump Zone')
+                protected_zone = min(12, F)
                 
-                if i < protected_zone:
-                    # HEAVY ANCHOR: We refuse to let the camera move for 12 frames
-                    v[:, :, i, :, :] = (ref_img * 0.35) + (frame_noise * 0.65)
-                    mask[:, :, i, :, :] = 0.2 # 80% locked
-                else:
-                    # RELEASE: Let the prompt take over motion
-                    v[:, :, i, :, :] = (ref_img * 0.05) + (frame_noise * 0.95)
-                    mask[:, :, i, :, :] = 0.9 # 10% locked (Identity Dust)
+                # Pre-generate noise floor once
+                noise = torch.randn_like(v) * 0.2 # Lower noise floor to stop 'Wash Out'
+
+                for i in range(1, F):
+                    if i < protected_zone:
+                        # PROGRESSIVE MASK: Starts at base_permission, fades to 1.0
+                        # This prevents the 'Scene Cut' at frame 1.
+                        lerp = i / protected_zone
+                        mask[:, :, i, :, :] = base_permission + (lerp * (1.0 - base_permission))
+                        
+                        # SIGNAL ANCHOR: Keep a ghost of the image to guide the flow
+                        anchor_strength = strength * 0.3 * (1.0 - lerp)
+                        v[:, :, i, :, :] = (ref_img * anchor_strength) + (noise[:, :, i, :, :] * (1.0 - anchor_strength))
+                    else:
+                        # FULL FREEDOM: Past the protected zone, the model follows the prompt
+                        # We still keep 5% 'Identity Dust' in the latent to help the LoRA
+                        v[:, :, i, :, :] = (ref_img * 0.05) + (noise[:, :, i, :, :] * 0.95)
+                        mask[:, :, i, :, :] = 1.0
 
         except Exception as e:
             print(f"IDLoRA Prepare Error: {e}")
             mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
 
         # --- DEBUG LOGS ---
-        print(f"DEBUG [PrepareVideo]: Video {v.shape} | Protected Zone: {protected_zone} frames")
-        print(f"DEBUG [PrepareVideo]: Mean/Std: {torch.mean(v).item():.4f} / {torch.std(v).item():.4f}")
+        print(f"DEBUG [PrepareVideo]: Strength {strength:.2f} | Base Permission: {base_permission:.2f}")
+        print(f"DEBUG [PrepareVideo]: Protected Zone: {protected_zone if 'protected_zone' in locals() else 0} frames")
         
         return ({"samples": v, "noise_mask": mask, "type": "video"},)
 
