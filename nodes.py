@@ -78,46 +78,40 @@ class IDLoRAPrepareVideo:
             f_ref_count = ref.shape[2] if ref.dim() == 5 else 1
             mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
 
-            # --- 2. KEYFRAME INJECTION ---
+            # --- 2. THE HARD ANCHOR (Frame 0) ---
             for i in range(f_ref_count):
-                if i < F: 
+                if i < F:
                     current_f = ref[:, :, i, :, :] if ref.dim() == 5 else ref.squeeze(2)
                     if v.shape[-2:] != current_f.shape[-2:]:
                         current_f = torch.nn.functional.interpolate(current_f, size=v.shape[-2:], mode="bilinear")
-                    
                     v[:, :, i, :, :] = (current_f * strength) + (v[:, :, i, :, :] * (1.0 - strength))
-                    mask[:, :, i, :, :] = 0.0  
+                    mask[:, :, i, :, :] = 0.0 
 
-            # --- 3. THE "IDENTITY LEASH" ---
-            if f_ref_count == 1 and F > 1:
-                ref_img = ref.squeeze(2)
-                leash_len = min(8, F)
-                for i in range(1, leash_len):
-                    leash_strength = strength * 0.25 * (1.0 - (i / leash_len))
-                    v[:, :, i, :, :] = (ref_img * leash_strength) + (v[:, :, i, :, :] * (1.0 - leash_strength))
-                    mask[:, :, i, :, :] = 0.3 + (0.5 * (i / leash_len))
-
-            # --- 4. THE FLOW ANCHOR (Replacing the Noise Gap) ---
-            # Instead of pure noise, we fill the background of EVERY frame 
-            # with a 5-10% 'ghost' of the reference image.
+            # --- 3. THE PROTECTED ZONE (The Anti-Jump-Cut) ---
             ref_img = ref.squeeze(2) if ref.dim() == 4 else ref[:, :, 0, :, :]
+            # We protect frame 0 to 12 (roughly 1 second of video)
+            protected_zone = min(F // 2, 12) 
             
-            # Create a base noise floor
-            noise = torch.randn_like(v) * 0.5
-            
-            # Fill only the frames that haven't been 'hard-locked' yet
             for i in range(f_ref_count, F):
-                # We inject 10% of the ref image into the noise floor of EVERY frame
-                # This ensures the 'Background' never turns into pure static.
-                v[:, :, i, :, :] = (ref_img * 0.1) + (noise[:, :, i, :, :] * 0.9)
+                # Reduced noise floor to allow the ID to breathe
+                frame_noise = torch.randn((B, C, H, W), device=v.device, dtype=v.dtype) * 0.4
+                
+                if i < protected_zone:
+                    # HEAVY ANCHOR: We refuse to let the camera move for 12 frames
+                    v[:, :, i, :, :] = (ref_img * 0.35) + (frame_noise * 0.65)
+                    mask[:, :, i, :, :] = 0.2 # 80% locked
+                else:
+                    # RELEASE: Let the prompt take over motion
+                    v[:, :, i, :, :] = (ref_img * 0.05) + (frame_noise * 0.95)
+                    mask[:, :, i, :, :] = 0.9 # 10% locked (Identity Dust)
 
         except Exception as e:
             print(f"IDLoRA Prepare Error: {e}")
             mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
 
-        # --- DEBUG LOGGING ---
-        print(f"DEBUG [PrepareVideo]: Video Shape {v.shape} | Ref Frames: {f_ref_count}")
-        print(f"DEBUG [PrepareVideo]: Video Range: [{torch.min(v).item():.4f}, {torch.max(v).item():.4f}]")
+        # --- DEBUG LOGS ---
+        print(f"DEBUG [PrepareVideo]: Video {v.shape} | Protected Zone: {protected_zone} frames")
+        print(f"DEBUG [PrepareVideo]: Mean/Std: {torch.mean(v).item():.4f} / {torch.std(v).item():.4f}")
         
         return ({"samples": v, "noise_mask": mask, "type": "video"},)
 
