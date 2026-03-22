@@ -65,18 +65,13 @@ class IDLoRAPrepareVideo:
         v = latent_video["samples"].clone()
         ref = first_frame_ref["samples"].clone()
         
-        # --- 1. LTXV LATENT SCALING (The "Noise" Fix) ---
-        # LTX2.3 expects latents in a specific range. 0.18215 is the standard.
-        v = v * 0.18215
-        ref = ref * 0.18215
-
-        # --- 2. DIMENSION SANITY CHECK ---
+        # --- 1. DIMENSION SANITY CHECK ---
         if v.dim() == 4: v = v.unsqueeze(0) # [B, C, F, H, W]
         if ref.dim() == 4: ref = ref.unsqueeze(0)
         
         B, C, F, H, W = v.shape
         
-        # --- 3. FIRST FRAME INJECTION (The "Perfect Video" Secret) ---
+        # --- 2. FIRST FRAME INJECTION (The "Perfect Video" Secret) ---
         try:
             # If ref has a temporal dim, squeeze it to get the single image frame
             if ref.dim() == 5: ref = ref.squeeze(2) 
@@ -88,6 +83,12 @@ class IDLoRAPrepareVideo:
             # Inject the reference into the first frame (Index 0)
             # We blend it based on strength to allow for some flexibility
             v[:, :, 0, :, :] = (ref * strength) + (v[:, :, 0, :, :] * (1.0 - strength))
+
+            # --- 3. THE 'BLACK OUTPUT' FIX ---
+            # If the rest of the frames (1 to F) are pure 0.0, the sampler can fail.
+            # We fill them with a very faint noise floor if they are empty.
+            if torch.max(torch.abs(v[:, :, 1:, :, :])) < 1e-5:
+                v[:, :, 1:, :, :] = torch.randn_like(v[:, :, 1:, :, :]) * 0.01            
             
             # --- 4. NOISE MASKING ---
             # Create a mask that tells the sampler: "Don't change frame 0 much"
