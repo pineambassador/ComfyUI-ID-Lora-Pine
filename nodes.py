@@ -71,39 +71,48 @@ class IDLoRAPrepareVideo:
         
         B, C, F, H, W = v.shape
         
-        # --- 2. FIRST FRAME INJECTION (The "Perfect Video" Secret) ---
+        # --- 2. MULTI-FRAME & SCALING LOGIC ---
         try:
-            # If ref has a temporal dim, squeeze it to get the single image frame
-            if ref.dim() == 5: ref = ref.squeeze(2) 
-            
-            # [NEW] Check if ref is scaled (VAE standard is ~0.18215)
-            # If Std Dev is low, boost it to ~1.0 for the Transformer
+            # Check if ref is scaled (VAE standard is ~0.18215)
+            # We do this before squeezing to get an accurate global Std Dev
             ref_std = torch.std(ref).item()
             if ref_std < 0.5:
                 ref = ref / 0.18215
 
-            # Ensure spatial alignment (Match Latent H/W)
-            if v.shape[-2:] != ref.shape[-2:]:
-                ref = torch.nn.functional.interpolate(ref, size=v.shape[-2:], mode="bilinear")
+            # Determine if we have a single frame or a sequence
+            # ref shape is [B, C, F_ref, H, W]
+            f_ref_count = ref.shape[2] if ref.dim() == 5 else 1
             
-            # Inject the reference into the first frame (Index 0)
-            # We blend it based on strength to allow for some flexibility
-            v[:, :, 0, :, :] = (ref * strength) + (v[:, :, 0, :, :] * (1.0 - strength))
-
-            # --- 3. THE 'BLACK OUTPUT' FIX ---
-            # If the rest of the frames (1 to F) are pure 0.0, the sampler can fail.
-            # We fill them with a very faint noise floor if they are empty.
-            if torch.max(torch.abs(v[:, :, 1:, :, :])) < 1e-5:
-                v[:, :, 1:, :, :] = torch.randn_like(v[:, :, 1:, :, :]) * 1.0            
-            
-            # --- 4. NOISE MASKING (With Temporal Bridge) ---
-            # Create a mask that tells the sampler: "Don't change frame 0 much"
+            # Initialize the mask
             mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
-            mask[:, :, 0, :, :] = 0.0  # Frame 0: Total Lock
-            if F > 1:
-                mask[:, :, 1, :, :] = 0.4  # Frame 1: Partial Guide
-            if F > 2:
-                mask[:, :, 2, :, :] = 0.7  # Frame 2: Starting to let go            
+
+            # Loop through available reference frames
+            for i in range(f_ref_count):
+                if i < F: # Don't exceed target video length
+                    # Extract current frame
+                    current_f = ref[:, :, i, :, :] if ref.dim() == 5 else ref.squeeze(2)
+                    
+                    # Ensure spatial alignment
+                    if v.shape[-2:] != current_f.shape[-2:]:
+                        current_f = torch.nn.functional.interpolate(current_f, size=v.shape[-2:], mode="bilinear")
+                    
+                    # Inject and Lock
+                    v[:, :, i, :, :] = (current_f * strength) + (v[:, :, i, :, :] * (1.0 - strength))
+                    mask[:, :, i, :, :] = 0.0 
+
+            # --- 3. THE "BRIDGE" & NOISE FLOOR ---
+            # If we only provided ONE frame, add the 'ghost' transition to prevent the 1s noise gap
+            if f_ref_count == 1:
+                if F > 1:
+                    v[:, :, 1, :, :] = (ref.squeeze(2) * 0.4) + (v[:, :, 1, :, :] * 0.6)
+                    mask[:, :, 1, :, :] = 0.4
+                if F > 2:
+                    v[:, :, 2, :, :] = (ref.squeeze(2) * 0.1) + (v[:, :, 2, :, :] * 0.9)
+                    mask[:, :, 2, :, :] = 0.7
+
+            # Fill empty frames with noise floor (0.8 is better for the 1.0 signal scale)
+            if torch.max(torch.abs(v[:, :, f_ref_count:, :, :])) < 1e-5:
+                v[:, :, f_ref_count:, :, :] = torch.randn_like(v[:, :, f_ref_count:, :, :]) * 0.8           
 
         except Exception as e:
             print(f"IDLoRA Prepare Error: {e}")
@@ -112,20 +121,20 @@ class IDLoRAPrepareVideo:
         # --- DEBUG LOGGING ---
         v_min, v_max = torch.min(v).item(), torch.max(v).item()
         v_std = torch.std(v).item()
+        # Use a safe way to get ref stats regardless of dim
         ref_min, ref_max = torch.min(ref).item(), torch.max(ref).item()
         
-        print(f"DEBUG [PrepareVideo]: Video Shape {v.shape}")
+        print(f"DEBUG [PrepareVideo]: Video Shape {v.shape} | Ref Frames: {f_ref_count}")
         print(f"DEBUG [PrepareVideo]: Video Range: [{v_min:.4f}, {v_max:.4f}] | Std: {v_std:.4f}")
         print(f"DEBUG [PrepareVideo]: Ref Range: [{ref_min:.4f}, {ref_max:.4f}]")
         
-        # Check for NaNs (The 'Black Screen' Killer)
         if torch.isnan(v).any():
             print("!!! WARNING: NaNs detected in Video Latent !!!")        
 
         return ({
             "samples": v, 
             "noise_mask": mask,
-            "type": "video" # CRITICAL for LTXAV Sampler
+            "type": "video" 
         },)
 
 # --- ID-LORA CONDITIONING & GUIDER ---
