@@ -85,7 +85,12 @@ class IDLoRAPrepareVideo:
         # Protect the first frame based on mask_strength
         mask[:, :, 0, :, :] = mask_strength 
         
-        return ({"samples": v, "noise_mask": mask},)
+        # Add the "type" key so the Sampler/Separator knows this is Video data
+        return ({
+            "samples": v, 
+            "noise_mask": mask,
+            "type": "video"  # This is the "Passport" the LTXAV Sampler checks
+        },)
 
 # --- ID-LORA CONDITIONING & GUIDER ---
 
