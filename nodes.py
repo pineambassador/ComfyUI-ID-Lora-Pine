@@ -53,7 +53,8 @@ class IDLoRAPrepareVideo:
             "required": {
                 "latent_video": ("LATENT",),
                 "first_frame_ref": ("LATENT",),
-                "strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "strength": ("FLOAT", {"default": 0.92, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "mode": (["Base", "Refiner"], {"default": "Base"}),
             }
         }
 
@@ -61,45 +62,44 @@ class IDLoRAPrepareVideo:
     FUNCTION = "prepare"
     CATEGORY = "ID-LoRA/Video"
 
-    def prepare(self, latent_video, first_frame_ref, strength):
+    def prepare(self, latent_video, first_frame_ref, strength, mode):
         v = latent_video["samples"].clone()
         ref = first_frame_ref["samples"].clone()
         
-        # --- 1. DIMENSION & SCALING ---
-        if v.dim() == 4: v = v.unsqueeze(0)
-        if ref.dim() == 4: ref = ref.unsqueeze(0)
+        # 1. Standard LTX2.3 VAE Scaling Correction
+        # This is the "Big Fish" for clarity. 
+        # LTX expects latents in a specific distribution.
+        if torch.std(ref).item() < 0.5:
+            ref = ref / 0.18215
+
         B, C, F, H, W = v.shape
+        f_ref_count = ref.shape[2] if ref.dim() == 5 else 1
         
-        try:
-            # Scaling for LTX2.3 Transformer
-            ref_std = torch.std(ref).item()
-            if ref_std < 0.5:
-                ref = ref / 0.18215
-
-            f_ref_count = ref.shape[2] if ref.dim() == 5 else 1
-            mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
-
-            # --- 2. THE NATIVE INVERSE CALCULATIONS ---
-            # LTX native logic: Mask = 1.0 - Strength. 
-            # If strength is 0.9, the 'Permission' to change pixels is 0.1.
-            base_permission = 1.0 - strength
-
-            # --- 3. KEYFRAME INJECTION ---
+        # 2. KEYFRAME INJECTION (Mode: Base Only)
+        # In Refiner mode, we skip injection because we want to refine the 
+        # existing video, not overwrite it with a static frame.
+        mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
+        
+        if mode == "Base":
             for i in range(f_ref_count):
                 if i < F:
                     current_f = ref[:, :, i, :, :] if ref.dim() == 5 else ref.squeeze(2)
-                    if v.shape[-2:] != current_f.shape[-2:]:
-                        current_f = torch.nn.functional.interpolate(current_f, size=v.shape[-2:], mode="bilinear")
                     
-                    # Inject at FULL slider strength
+                    # Ensure spatial matching
+                    if v.shape[-2:] != current_f.shape[-2:]:
+                        current_f = torch.nn.functional.interpolate(
+                            current_f, size=v.shape[-2:], mode="bilinear"
+                        )
+                    
+                    # Inject at the slider strength (e.g., 0.92)
                     v[:, :, i, :, :] = (current_f * strength) + (v[:, :, i, :, :] * (1.0 - strength))
-                    # Hard lock the keyframes (Native logic uses 0.0 for fixed frames)
+                    
+                    # Hard-lock Frame 0 only. 
+                    # We leave frames 1-F to be handled by the Scheduler's noise.
                     mask[:, :, i, :, :] = 0.0 
 
-        except Exception as e:
-            print(f"IDLoRA Prepare Error: {e}")
-            mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
-
+        # 3. OUTPUT
+        # For Refiner mode, v remains the original upscaled latent and mask is all 1s.
         return ({"samples": v, "noise_mask": mask, "type": "video"},)
 
 # --- ID-LORA CONDITIONING & GUIDER ---
