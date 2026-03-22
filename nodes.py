@@ -5,44 +5,68 @@ import comfy.samplers
 
 # --- AUDIO PREPARATION ---
 
-class IDLoRAAudioPreprocessor:
+class IDLoRAPrepareAudioReference:
     @classmethod
     def INPUT_TYPES(s):
         return {
             "required": {
+                "conditioning": ("CONDITIONING",),
                 "audio": ("AUDIO",),
+                "audio_vae": ("VAE",),
                 "target_sample_rate": ("INT", {"default": 24000}),
+                "audio_strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 2.0, "step": 0.01}),
             }
         }
 
-    RETURN_TYPES = ("AUDIO",)
-    FUNCTION = "preprocess"
-    CATEGORY = "ID-LoRA/Audio"
+    RETURN_TYPES = ("CONDITIONING",)
+    RETURN_NAMES = ("positive",)
+    FUNCTION = "process_audio_reference"
+    CATEGORY = "ID-LoRA/Conditioning"
 
-    def preprocess(self, audio, target_sample_rate):
+    def process_audio_reference(self, conditioning, audio, audio_vae, target_sample_rate, audio_strength):
+        # --- 1. PREPROCESS (Resample & Mono) ---
         waveform = audio["waveform"]
         sr = audio["sample_rate"]
-        if waveform.shape[1] > 1: 
+        
+        # Force Mono
+        if waveform.shape[1] > 1:
             waveform = torch.mean(waveform, dim=1, keepdim=True)
+            
+        # Resample if necessary
         if sr != target_sample_rate:
             resampler = T.Resample(sr, target_sample_rate)
             waveform = resampler(waveform)
-        return ({"waveform": waveform, "sample_rate": target_sample_rate},)
 
-class IDLoRAAudioVAEEncode:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {"required": {"audio": ("AUDIO",), "audio_vae": ("VAE",)}}
-    RETURN_TYPES = ("LATENT",)
-    FUNCTION = "encode"
-    CATEGORY = "ID-LoRA/Audio"
+        # --- 2. VAE ENCODE ---
+        vae_input = {"waveform": waveform, "sample_rate": target_sample_rate}
+        latents_dict = audio_vae.encode(vae_input)
+        
+        # Get the tensor (usually [B, C, T] or [B, C, T, H, W])
+        audio_samples = latents_dict["samples"] if isinstance(latents_dict, dict) else latents_dict
 
-    def encode(self, audio, audio_vae):
-        vae_input = {"waveform": audio["waveform"], "sample_rate": audio["sample_rate"]}
-        latents = audio_vae.encode(vae_input)
-        if latents.dim() == 3: # Ensure 5D [B, C, T, 1, 1]
-            latents = latents.unsqueeze(-1).unsqueeze(-1)
-        return ({"samples": latents, "sample_rate": audio["sample_rate"], "type": "audio"},)
+        # --- 3. LTX2.3 SCALING & STRENGTH ---
+        # Apply the VAE constant (/ 0.18215) and your custom strength multiplier
+        audio_samples = (audio_samples / 0.18215) * audio_strength
+
+        # Ensure 5D [B, C, T, 1, 1] for LTX transformer compatibility
+        if audio_samples.dim() == 3:
+            audio_samples = audio_samples.unsqueeze(-1).unsqueeze(-1)
+
+        # --- 4. CONDITIONING INJECTION ---
+        new_conditioning = []
+        for t in conditioning:
+            # t[0] is the CLIP pooled output, t[1] is the metadata dictionary
+            metadata = t[1].copy()
+            
+            # Inject the processed audio latent as the "Identity Reference"
+            metadata["audio_latent"] = audio_samples
+            
+            # Clone the tensor to avoid side effects
+            new_conditioning.append([t[0].clone(), metadata])
+
+        print(f"DEBUG [AudioRef]: Injected Latent with Strength {audio_strength:.2f} | Shape: {audio_samples.shape}")
+        
+        return (new_conditioning,)
 
 # --- VIDEO PREPARATION (First Frame Injection) ---
 
@@ -103,23 +127,6 @@ class IDLoRAPrepareVideo:
         return ({"samples": v, "noise_mask": mask, "type": "video"},)
 
 # --- ID-LORA CONDITIONING & GUIDER ---
-
-class IDLoRAConditioningSetAudio:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {"required": {"conditioning": ("CONDITIONING",), "audio_latent": ("LATENT",)}}
-    RETURN_TYPES = ("CONDITIONING",)
-    FUNCTION = "set_audio"
-    CATEGORY = "ID-LoRA/Conditioning"
-
-    def set_audio(self, conditioning, audio_latent):
-        actual_audio_tensor = audio_latent["samples"]
-        new_conditioning = []
-        for t in conditioning:
-            m = t[1].copy()
-            m["audio_latent"] = actual_audio_tensor # The "Identity" Reference
-            new_conditioning.append([t[0].clone(), m])
-        return (new_conditioning,)
 
 class IDLoRAGuider:
     @classmethod
@@ -182,6 +189,10 @@ class IDLoRAPromptFormatter:
                 "negative_prompt": ("STRING", {"multiline": True, "default": "low quality, blurry..."}),
             }
         }
+    RETURN_TYPES = ("STRING", "STRING")
+    RETURN_NAMES = ("positive_prompt", "negative_prompt")
+    FUNCTION = "format_prompt"
+    CATEGORY = "ID-LoRA/Prompting"
 
     def format_prompt(self, id_tag, primary_desc, secondary_desc, visual_action, dialogue_text, environmental_sounds, negative_prompt):
         # 1. DYNAMIC VISUAL CONSTRUCTION
@@ -229,11 +240,10 @@ class IDLoRAAudioNoiseInjector:
         
         # 1. Scaling for LTX2.3 (The VAE Constant)
         # This keeps the audio latents in the same numerical 'range' as the video
-        scaling_factor = 0.18215
+        #scaling_factor = 0.18215
         
         torch.manual_seed(seed)
-        # We scale the noise so it's not 'screaming' at the transformer
-        noise = torch.randn_like(audio_tensor) * scaling_factor
+        noise = torch.randn_like(audio_tensor)
         
         # 2. Blending
         # Using strength 1.0 here means we are starting with 'Balanced LTX Noise'
