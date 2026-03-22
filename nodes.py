@@ -76,6 +76,12 @@ class IDLoRAPrepareVideo:
             # If ref has a temporal dim, squeeze it to get the single image frame
             if ref.dim() == 5: ref = ref.squeeze(2) 
             
+            # [NEW] Check if ref is scaled (VAE standard is ~0.18215)
+            # If Std Dev is low, boost it to ~1.0 for the Transformer
+            ref_std = torch.std(ref).item()
+            if ref_std < 0.5:
+                ref = ref / 0.18215
+
             # Ensure spatial alignment (Match Latent H/W)
             if v.shape[-2:] != ref.shape[-2:]:
                 ref = torch.nn.functional.interpolate(ref, size=v.shape[-2:], mode="bilinear")
@@ -88,7 +94,7 @@ class IDLoRAPrepareVideo:
             # If the rest of the frames (1 to F) are pure 0.0, the sampler can fail.
             # We fill them with a very faint noise floor if they are empty.
             if torch.max(torch.abs(v[:, :, 1:, :, :])) < 1e-5:
-                v[:, :, 1:, :, :] = torch.randn_like(v[:, :, 1:, :, :]) * 0.01            
+                v[:, :, 1:, :, :] = torch.randn_like(v[:, :, 1:, :, :]) * 1.0            
             
             # --- 4. NOISE MASKING ---
             # Create a mask that tells the sampler: "Don't change frame 0 much"
@@ -99,7 +105,19 @@ class IDLoRAPrepareVideo:
             print(f"IDLoRA Prepare Error: {e}")
             mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
 
-        # --- 5. LTXV METADATA ---
+        # --- DEBUG LOGGING ---
+        v_min, v_max = torch.min(v).item(), torch.max(v).item()
+        v_std = torch.std(v).item()
+        ref_min, ref_max = torch.min(ref).item(), torch.max(ref).item()
+        
+        print(f"DEBUG [PrepareVideo]: Video Shape {v.shape}")
+        print(f"DEBUG [PrepareVideo]: Video Range: [{v_min:.4f}, {v_max:.4f}] | Std: {v_std:.4f}")
+        print(f"DEBUG [PrepareVideo]: Ref Range: [{ref_min:.4f}, {ref_max:.4f}]")
+        
+        # Check for NaNs (The 'Black Screen' Killer)
+        if torch.isnan(v).any():
+            print("!!! WARNING: NaNs detected in Video Latent !!!")        
+
         return ({
             "samples": v, 
             "noise_mask": mask,
