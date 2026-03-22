@@ -243,13 +243,20 @@ class IDLoRAAudioNoiseInjector:
         s = samples.copy()
         audio_tensor = s["samples"]
         
-        # Match the shape exactly to whatever LTX provided
-        torch.manual_seed(seed)
-        noise = torch.randn_like(audio_tensor)
+        # 1. Scaling for LTX2.3 (The VAE Constant)
+        # This keeps the audio latents in the same numerical 'range' as the video
+        scaling_factor = 0.18215
         
-        # If strength is 1.0, it's a pure blank canvas. 
-        # If lower, it blends with the input (useful for img2vid style audio)
+        torch.manual_seed(seed)
+        # We scale the noise so it's not 'screaming' at the transformer
+        noise = torch.randn_like(audio_tensor) * scaling_factor
+        
+        # 2. Blending
+        # Using strength 1.0 here means we are starting with 'Balanced LTX Noise'
         s["samples"] = (audio_tensor * (1.0 - strength)) + (noise * strength)
+        
+        # Optional: Print stats for the first frame to verify scaling
+        print(f"DEBUG [AudioNoise]: Std Dev: {torch.std(s['samples']).item():.4f}")
             
         return (s,)
 
