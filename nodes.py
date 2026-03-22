@@ -256,13 +256,11 @@ class IDLoRAAudioNoiseInjector:
 
 
 NODE_CLASS_MAPPINGS = {
-    "IDLoRAAudioPreprocessor": IDLoRAAudioPreprocessor,
-    "IDLoRAAudioVAEEncode": IDLoRAAudioVAEEncode,
-    "IDLoRAPrepareVideo": IDLoRAPrepareVideo,
-    "IDLoRAConditioningSetAudio": IDLoRAConditioningSetAudio,
     "IDLoRAGuider": IDLoRAGuider,
+    "IDLoRAPrepareVideo": IDLoRAPrepareVideo,
     "IDLoRAPromptFormatter": IDLoRAPromptFormatter,
     "IDLoRAAudioNoiseInjector": IDLoRAAudioNoiseInjector,
+    "IDLoRAPrepareAudioReference": IDLoRAPrepareAudioReference,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {}
