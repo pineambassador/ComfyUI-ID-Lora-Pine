@@ -173,54 +173,38 @@ class IDLoRAPromptFormatter:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "id_tag": ("STRING", {
-                    "default": "[NAME]",
-                    "label": "Identity Tag (e.g., [NAME])"
-                }),
-                "subject_description": ("STRING", {
-                    "multiline": True, 
-                    "default": "a middle-aged man with a kind face",
-                    "label": "VISUAL: Character Description"
-                }),
-                "visual_action": ("STRING", {
-                    "multiline": True, 
-                    "default": "nodding slowly while looking at the camera",
-                    "label": "VISUAL: Movement & Action"
-                }),
-                "dialogue_text": ("STRING", {
-                    "multiline": True, 
-                    "default": "I think we've finally found the solution.",
-                    "label": "SPEECH: Dialogue Content"
-                }),
-                "environmental_sounds": ("STRING", {
-                    "multiline": True, 
-                    "default": "soft rain pattering against a window, distant thunder",
-                    "label": "SOUNDS: Environment Audio"
-                }),
-                "negative_prompt": ("STRING", {
-                    "multiline": True, 
-                    "default": "low quality, blurry, static, digital noise, out of sync, distorted voice, muffled audio, background music, watermark, text",
-                    "label": "NEGATIVE: Exclude these qualities"
-                }),
+                "id_tag": ("STRING", {"default": "[NAME]"}),
+                "primary_desc": ("STRING", {"multiline": True, "default": "a middle-aged man with a kind face"}),
+                "secondary_desc": ("STRING", {"multiline": True, "default": ""}), # Leave empty for 1 person
+                "visual_action": ("STRING", {"multiline": True, "default": "nodding slowly while looking at the camera"}),
+                "dialogue_text": ("STRING", {"multiline": True, "default": "I think we've finally found the solution."}),
+                "environmental_sounds": ("STRING", {"multiline": True, "default": "soft rain"}),
+                "negative_prompt": ("STRING", {"multiline": True, "default": "low quality, blurry..."}),
             }
         }
 
-    RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("positive_prompt", "negative_prompt")
-    FUNCTION = "format_prompt"
-    CATEGORY = "ID-LoRA/Prompting"
+    def format_prompt(self, id_tag, primary_desc, secondary_desc, visual_action, dialogue_text, environmental_sounds, negative_prompt):
+        # 1. DYNAMIC VISUAL CONSTRUCTION
+        if secondary_desc.strip() and secondary_desc.lower() != "none":
+            # TWO PERSON MODE: Forces spatial separation to stop speech-hijacking
+            visual_block = (
+                f"[VISUAL]: {id_tag} {primary_desc} on the left, "
+                f"and {secondary_desc} on the right. "
+                f"They are {visual_action}."
+            )
+        else:
+            # SINGLE PERSON MODE: Standard centered focus
+            visual_block = f"[VISUAL]: {id_tag} {primary_desc}, {visual_action}."
 
-    def format_prompt(self, id_tag, subject_description, visual_action, dialogue_text, environmental_sounds, negative_prompt):
-        # LTX-2.3 / ID-LoRA Multi-Modal Prompt Construction
-        # [VISUAL] targets the DiT video stream
-        # [SPEECH] targets the Lip-Sync/Audio-Visual binding
-        # [SOUNDS] targets the latent audio vocoder
+        # 2. DIALOGUE ATTRIBUTION
+        # If there are two people, the model needs to see the name 
+        # specifically inside the SPEECH tag to link the audio to the correct mouth.
+        speech_block = f"[SPEECH]: {dialogue_text}"
         
-        pos = (
-            f"[VISUAL]: {id_tag} {subject_description}, {visual_action}. "
-            f"[SPEECH]: {id_tag} says \"{dialogue_text}\". "
-            f"[SOUNDS]: {environmental_sounds}."
-        )
+        # 3. SOUNDS
+        sound_block = f"[SOUNDS]: {environmental_sounds}."
+
+        pos = f"{visual_block} {speech_block} {sound_block}"
         
         return (pos, negative_prompt)
 
