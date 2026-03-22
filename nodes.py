@@ -65,77 +65,61 @@ class IDLoRAPrepareVideo:
         v = latent_video["samples"].clone()
         ref = first_frame_ref["samples"].clone()
         
-        # --- 1. DIMENSION SANITY CHECK ---
-        if v.dim() == 4: v = v.unsqueeze(0) # [B, C, F, H, W]
+        # --- 1. DIMENSION & SCALING ---
+        if v.dim() == 4: v = v.unsqueeze(0)
         if ref.dim() == 4: ref = ref.unsqueeze(0)
-        
         B, C, F, H, W = v.shape
         
-        # --- 2. MULTI-FRAME & SCALING LOGIC ---
         try:
-            # Check if ref is scaled (VAE standard is ~0.18215)
             ref_std = torch.std(ref).item()
             if ref_std < 0.5:
                 ref = ref / 0.18215
 
-            # Determine if we have a single frame or a sequence
             f_ref_count = ref.shape[2] if ref.dim() == 5 else 1
-            
-            # Initialize the mask
             mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
 
-            # Loop through available reference frames (Keyframe Injection)
+            # --- 2. KEYFRAME INJECTION ---
             for i in range(f_ref_count):
                 if i < F: 
                     current_f = ref[:, :, i, :, :] if ref.dim() == 5 else ref.squeeze(2)
-                    
                     if v.shape[-2:] != current_f.shape[-2:]:
                         current_f = torch.nn.functional.interpolate(current_f, size=v.shape[-2:], mode="bilinear")
                     
-                    # Inject and Hard Lock
                     v[:, :, i, :, :] = (current_f * strength) + (v[:, :, i, :, :] * (1.0 - strength))
                     mask[:, :, i, :, :] = 0.0  
 
-            # --- 3. THE "IDENTITY LEASH" (Prevents Scene/Angle Cuts) ---
-            # If providing ONE frame, we leash the first 8 frames (1 LTX block)
+            # --- 3. THE "IDENTITY LEASH" ---
             if f_ref_count == 1 and F > 1:
                 ref_img = ref.squeeze(2)
                 leash_len = min(8, F)
                 for i in range(1, leash_len):
-                    # Maintain a ghost of the image to keep the camera still
-                    # We use a percentage of the user-defined strength
                     leash_strength = strength * 0.25 * (1.0 - (i / leash_len))
                     v[:, :, i, :, :] = (ref_img * leash_strength) + (v[:, :, i, :, :] * (1.0 - leash_strength))
-                    
-                    # Tighter mask prevents the sampler from jumping to a new camera angle
                     mask[:, :, i, :, :] = 0.3 + (0.5 * (i / leash_len))
 
-            # --- 4. NOISE FLOOR ---
-            # Using 0.5 noise helps the leash hold better than 0.8 during I2V
-            if torch.max(torch.abs(v[:, :, f_ref_count:, :, :])) < 1e-5:
-                v[:, :, f_ref_count:, :, :] = torch.randn_like(v[:, :, f_ref_count:, :, :]) * 0.5           
+            # --- 4. THE FLOW ANCHOR (Replacing the Noise Gap) ---
+            # Instead of pure noise, we fill the background of EVERY frame 
+            # with a 5-10% 'ghost' of the reference image.
+            ref_img = ref.squeeze(2) if ref.dim() == 4 else ref[:, :, 0, :, :]
+            
+            # Create a base noise floor
+            noise = torch.randn_like(v) * 0.5
+            
+            # Fill only the frames that haven't been 'hard-locked' yet
+            for i in range(f_ref_count, F):
+                # We inject 10% of the ref image into the noise floor of EVERY frame
+                # This ensures the 'Background' never turns into pure static.
+                v[:, :, i, :, :] = (ref_img * 0.1) + (noise[:, :, i, :, :] * 0.9)
 
         except Exception as e:
             print(f"IDLoRA Prepare Error: {e}")
             mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
 
         # --- DEBUG LOGGING ---
-        v_min, v_max = torch.min(v).item(), torch.max(v).item()
-        v_std = torch.std(v).item()
-        ref_min, ref_max = torch.min(ref).item(), torch.max(ref).item()
-        
         print(f"DEBUG [PrepareVideo]: Video Shape {v.shape} | Ref Frames: {f_ref_count}")
-        print(f"DEBUG [PrepareVideo]: Video Range: [{v_min:.4f}, {v_max:.4f}] | Std: {v_std:.4f}")
-        print(f"DEBUG [PrepareVideo]: Ref Range: [{ref_min:.4f}, {ref_max:.4f}]")
+        print(f"DEBUG [PrepareVideo]: Video Range: [{torch.min(v).item():.4f}, {torch.max(v).item():.4f}]")
         
-        if torch.isnan(v).any():
-            print("!!! WARNING: NaNs detected in Video Latent !!!")        
-
-        return ({
-            "samples": v, 
-            "noise_mask": mask,
-            "type": "video" 
-        },)
+        return ({"samples": v, "noise_mask": mask, "type": "video"},)
 
 # --- ID-LORA CONDITIONING & GUIDER ---
 
