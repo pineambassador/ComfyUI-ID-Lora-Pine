@@ -74,45 +74,46 @@ class IDLoRAPrepareVideo:
         # --- 2. MULTI-FRAME & SCALING LOGIC ---
         try:
             # Check if ref is scaled (VAE standard is ~0.18215)
-            # We do this before squeezing to get an accurate global Std Dev
             ref_std = torch.std(ref).item()
             if ref_std < 0.5:
                 ref = ref / 0.18215
 
             # Determine if we have a single frame or a sequence
-            # ref shape is [B, C, F_ref, H, W]
             f_ref_count = ref.shape[2] if ref.dim() == 5 else 1
             
             # Initialize the mask
             mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
 
-            # Loop through available reference frames
+            # Loop through available reference frames (Keyframe Injection)
             for i in range(f_ref_count):
-                if i < F: # Don't exceed target video length
-                    # Extract current frame
+                if i < F: 
                     current_f = ref[:, :, i, :, :] if ref.dim() == 5 else ref.squeeze(2)
                     
-                    # Ensure spatial alignment
                     if v.shape[-2:] != current_f.shape[-2:]:
                         current_f = torch.nn.functional.interpolate(current_f, size=v.shape[-2:], mode="bilinear")
                     
-                    # Inject and Lock
+                    # Inject and Hard Lock
                     v[:, :, i, :, :] = (current_f * strength) + (v[:, :, i, :, :] * (1.0 - strength))
-                    mask[:, :, i, :, :] = 0.0 
+                    mask[:, :, i, :, :] = 0.0  
 
-            # --- 3. THE "BRIDGE" & NOISE FLOOR ---
-            # If we only provided ONE frame, add the 'ghost' transition to prevent the 1s noise gap
-            if f_ref_count == 1:
-                if F > 1:
-                    v[:, :, 1, :, :] = (ref.squeeze(2) * 0.4) + (v[:, :, 1, :, :] * 0.6)
-                    mask[:, :, 1, :, :] = 0.4
-                if F > 2:
-                    v[:, :, 2, :, :] = (ref.squeeze(2) * 0.1) + (v[:, :, 2, :, :] * 0.9)
-                    mask[:, :, 2, :, :] = 0.7
+            # --- 3. THE "IDENTITY LEASH" (Prevents Scene/Angle Cuts) ---
+            # If providing ONE frame, we leash the first 8 frames (1 LTX block)
+            if f_ref_count == 1 and F > 1:
+                ref_img = ref.squeeze(2)
+                leash_len = min(8, F)
+                for i in range(1, leash_len):
+                    # Maintain a ghost of the image to keep the camera still
+                    # We use a percentage of the user-defined strength
+                    leash_strength = strength * 0.25 * (1.0 - (i / leash_len))
+                    v[:, :, i, :, :] = (ref_img * leash_strength) + (v[:, :, i, :, :] * (1.0 - leash_strength))
+                    
+                    # Tighter mask prevents the sampler from jumping to a new camera angle
+                    mask[:, :, i, :, :] = 0.3 + (0.5 * (i / leash_len))
 
-            # Fill empty frames with noise floor (0.8 is better for the 1.0 signal scale)
+            # --- 4. NOISE FLOOR ---
+            # Using 0.5 noise helps the leash hold better than 0.8 during I2V
             if torch.max(torch.abs(v[:, :, f_ref_count:, :, :])) < 1e-5:
-                v[:, :, f_ref_count:, :, :] = torch.randn_like(v[:, :, f_ref_count:, :, :]) * 0.8           
+                v[:, :, f_ref_count:, :, :] = torch.randn_like(v[:, :, f_ref_count:, :, :]) * 0.5           
 
         except Exception as e:
             print(f"IDLoRA Prepare Error: {e}")
@@ -121,7 +122,6 @@ class IDLoRAPrepareVideo:
         # --- DEBUG LOGGING ---
         v_min, v_max = torch.min(v).item(), torch.max(v).item()
         v_std = torch.std(v).item()
-        # Use a safe way to get ref stats regardless of dim
         ref_min, ref_max = torch.min(ref).item(), torch.max(ref).item()
         
         print(f"DEBUG [PrepareVideo]: Video Shape {v.shape} | Ref Frames: {f_ref_count}")
