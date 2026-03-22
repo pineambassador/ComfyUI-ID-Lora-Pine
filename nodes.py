@@ -13,7 +13,7 @@ class IDLoRAPrepareAudioReference:
                 "conditioning": ("CONDITIONING",),
                 "audio": ("AUDIO",),
                 "audio_vae": ("VAE",),
-                "target_sample_rate": ("INT", {"default": 24000}),
+                "target_sample_rate": ("INT", {"default": 24000, "min": 8000, "max": 96000, "step": 1000}),
                 "audio_strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 2.0, "step": 0.01}),
             }
         }
@@ -24,49 +24,63 @@ class IDLoRAPrepareAudioReference:
     CATEGORY = "ID-LoRA/Conditioning"
 
     def process_audio_reference(self, conditioning, audio, audio_vae, target_sample_rate, audio_strength):
-        # --- 1. PREPROCESS (Resample & Mono) ---
-        waveform = audio["waveform"]
-        sr = audio["sample_rate"]
-        
-        # Force Mono
-        if waveform.shape[1] > 1:
-            waveform = torch.mean(waveform, dim=1, keepdim=True)
+        try:
+            waveform = audio["waveform"]
+            sr = audio["sample_rate"]
             
-        # Resample if necessary
-        if sr != target_sample_rate:
-            resampler = T.Resample(sr, target_sample_rate)
-            waveform = resampler(waveform)
+            # 1. Ensure Waveform is [Batch, Channels, Samples]
+            # ComfyUI often provides [Batch, Samples, Channels]
+            if waveform.dim() == 3 and waveform.shape[2] < waveform.shape[1]:
+                waveform = waveform.transpose(1, 2)
+            elif waveform.dim() == 2:
+                waveform = waveform.unsqueeze(0) # Add batch dim if missing
 
-        # --- 2. VAE ENCODE ---
-        vae_input = {"waveform": waveform, "sample_rate": target_sample_rate}
-        latents_dict = audio_vae.encode(vae_input)
-        
-        # Get the tensor (usually [B, C, T] or [B, C, T, H, W])
-        audio_samples = latents_dict["samples"] if isinstance(latents_dict, dict) else latents_dict
+            # Force Mono
+            if waveform.shape[1] > 1:
+                waveform = torch.mean(waveform, dim=1, keepdim=True)
+                
+            # 2. Resample
+            if sr != target_sample_rate:
+                import torchaudio.transforms as T
+                resampler = T.Resample(sr, target_sample_rate).to(waveform.device)
+                waveform = resampler(waveform.to(torch.float32))
 
-        # --- 3. LTX2.3 SCALING & STRENGTH ---
-        # Apply the VAE constant (/ 0.18215) and your custom strength multiplier
-        audio_samples = (audio_samples / 0.18215) * audio_strength
-
-        # Ensure 5D [B, C, T, 1, 1] for LTX transformer compatibility
-        if audio_samples.dim() == 3:
-            audio_samples = audio_samples.unsqueeze(-1).unsqueeze(-1)
-
-        # --- 4. CONDITIONING INJECTION ---
-        new_conditioning = []
-        for t in conditioning:
-            # t[0] is the CLIP pooled output, t[1] is the metadata dictionary
-            metadata = t[1].copy()
+            # 3. VAE ENCODE
+            vae_input = {"waveform": waveform, "sample_rate": target_sample_rate}
+            latents_dict = audio_vae.encode(vae_input)
             
-            # Inject the processed audio latent as the "Identity Reference"
-            metadata["audio_latent"] = audio_samples
-            
-            # Clone the tensor to avoid side effects
-            new_conditioning.append([t[0].clone(), metadata])
+            # Handle different VAE return types
+            if isinstance(latents_dict, dict):
+                audio_samples = latents_dict.get("samples", None)
+            else:
+                audio_samples = latents_dict
 
-        print(f"DEBUG [AudioRef]: Injected Latent with Strength {audio_strength:.2f} | Shape: {audio_samples.shape}")
-        
-        return (new_conditioning,)
+            if audio_samples is None:
+                print("ERROR: Audio VAE returned None")
+                return (conditioning,)
+
+            # 4. LTX2.3 Adjustments
+            # Using 1.0 as base scaling for LTX2.3 Audio conditioning
+            audio_samples = audio_samples * audio_strength 
+
+            # Ensure 5D [B, C, T, 1, 1] for LTX transformer
+            while audio_samples.dim() < 5:
+                audio_samples = audio_samples.unsqueeze(-1)
+
+            # 5. CONDITIONING INJECTION
+            new_conditioning = []
+            for t in conditioning:
+                metadata = t[1].copy()
+                metadata["audio_latent"] = audio_samples.clone()
+                new_conditioning.append([t[0].clone(), metadata])
+
+            print(f"DEBUG [AudioRef]: Success! Injected Shape: {audio_samples.shape}")
+            return (new_conditioning,)
+
+        except Exception as e:
+            print(f"ERROR in IDLoRAPrepareAudioReference: {str(e)}")
+            # Return original conditioning so the workflow doesn't hard-crash
+            return (conditioning,)
 
 # --- VIDEO PREPARATION (First Frame Injection) ---
 
