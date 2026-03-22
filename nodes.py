@@ -96,39 +96,10 @@ class IDLoRAPrepareVideo:
                     # Hard lock the keyframes (Native logic uses 0.0 for fixed frames)
                     mask[:, :, i, :, :] = 0.0 
 
-            # --- 4. THE TEMPORAL LEASH (Using Native Scaling) ---
-            if f_ref_count == 1 and F > 1:
-                ref_img = ref.squeeze(2)
-                # We protect the first 8-12 frames (The 'Jump Zone')
-                protected_zone = min(12, F)
-                
-                # Pre-generate noise floor once
-                noise = torch.randn_like(v) * 0.2 # Lower noise floor to stop 'Wash Out'
-
-                for i in range(1, F):
-                    if i < protected_zone:
-                        # PROGRESSIVE MASK: Starts at base_permission, fades to 1.0
-                        # This prevents the 'Scene Cut' at frame 1.
-                        lerp = i / protected_zone
-                        mask[:, :, i, :, :] = base_permission + (lerp * (1.0 - base_permission))
-                        
-                        # SIGNAL ANCHOR: Keep a ghost of the image to guide the flow
-                        anchor_strength = strength * 0.3 * (1.0 - lerp)
-                        v[:, :, i, :, :] = (ref_img * anchor_strength) + (noise[:, :, i, :, :] * (1.0 - anchor_strength))
-                    else:
-                        # FULL FREEDOM: Past the protected zone, the model follows the prompt
-                        # We still keep 5% 'Identity Dust' in the latent to help the LoRA
-                        v[:, :, i, :, :] = (ref_img * 0.05) + (noise[:, :, i, :, :] * 0.95)
-                        mask[:, :, i, :, :] = 1.0
-
         except Exception as e:
             print(f"IDLoRA Prepare Error: {e}")
             mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
 
-        # --- DEBUG LOGS ---
-        print(f"DEBUG [PrepareVideo]: Strength {strength:.2f} | Base Permission: {base_permission:.2f}")
-        print(f"DEBUG [PrepareVideo]: Protected Zone: {protected_zone if 'protected_zone' in locals() else 0} frames")
-        
         return ({"samples": v, "noise_mask": mask, "type": "video"},)
 
 # --- ID-LORA CONDITIONING & GUIDER ---
