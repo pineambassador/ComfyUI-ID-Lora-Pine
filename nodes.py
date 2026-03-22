@@ -96,11 +96,15 @@ class IDLoRAPrepareVideo:
             if torch.max(torch.abs(v[:, :, 1:, :, :])) < 1e-5:
                 v[:, :, 1:, :, :] = torch.randn_like(v[:, :, 1:, :, :]) * 1.0            
             
-            # --- 4. NOISE MASKING ---
+            # --- 4. NOISE MASKING (With Temporal Bridge) ---
             # Create a mask that tells the sampler: "Don't change frame 0 much"
             mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
-            mask[:, :, 0, :, :] = 0.0  # 0.0 means "Keep this exactly as provided"
-            
+            mask[:, :, 0, :, :] = 0.0  # Frame 0: Total Lock
+            if F > 1:
+                mask[:, :, 1, :, :] = 0.4  # Frame 1: Partial Guide
+            if F > 2:
+                mask[:, :, 2, :, :] = 0.7  # Frame 2: Starting to let go            
+
         except Exception as e:
             print(f"IDLoRA Prepare Error: {e}")
             mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
