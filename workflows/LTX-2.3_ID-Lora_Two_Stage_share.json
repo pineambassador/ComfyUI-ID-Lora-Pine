@@ -3502,75 +3502,6 @@
       ]
     },
     {
-      "id": 5169,
-      "type": "IDLoRAGuider",
-      "pos": [
-        403.8573007914148,
-        3632.229654420362
-      ],
-      "size": [
-        270,
-        186
-      ],
-      "flags": {},
-      "order": 99,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 13857
-        },
-        {
-          "name": "conditioning",
-          "type": "CONDITIONING",
-          "link": 13967
-        },
-        {
-          "name": "negative_cond",
-          "type": "CONDITIONING",
-          "link": 13968
-        },
-        {
-          "name": "joint_latent",
-          "type": "LATENT",
-          "link": 13918
-        },
-        {
-          "name": "id_dropout_cond",
-          "shape": 7,
-          "type": "CONDITIONING",
-          "link": 13969
-        }
-      ],
-      "outputs": [
-        {
-          "name": "guider",
-          "type": "GUIDER",
-          "links": [
-            13862
-          ]
-        },
-        {
-          "name": "joint_latent",
-          "type": "LATENT",
-          "links": [
-            13863
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "pineambassador/ComfyUI-ID-Lora-Pine",
-        "ver": "51baaa30c4541356991aadc886eff9e4c225ed98",
-        "Node name for S&R": "IDLoRAGuider"
-      },
-      "widgets_values": [
-        1.5,
-        2.5,
-        3.5
-      ]
-    },
-    {
       "id": 4831,
       "type": "KSamplerSelect",
       "pos": [
@@ -3766,75 +3697,6 @@
       ]
     },
     {
-      "id": 5167,
-      "type": "IDLoRAGuider",
-      "pos": [
-        -1457.5524573131124,
-        3606.9413232578186
-      ],
-      "size": [
-        270,
-        186
-      ],
-      "flags": {},
-      "order": 81,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 13995
-        },
-        {
-          "name": "conditioning",
-          "type": "CONDITIONING",
-          "link": 13965
-        },
-        {
-          "name": "negative_cond",
-          "type": "CONDITIONING",
-          "link": 13966
-        },
-        {
-          "name": "joint_latent",
-          "type": "LATENT",
-          "link": 13905
-        },
-        {
-          "name": "id_dropout_cond",
-          "shape": 7,
-          "type": "CONDITIONING",
-          "link": 13964
-        }
-      ],
-      "outputs": [
-        {
-          "name": "guider",
-          "type": "GUIDER",
-          "links": [
-            13852
-          ]
-        },
-        {
-          "name": "joint_latent",
-          "type": "LATENT",
-          "links": [
-            13851
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "pineambassador/ComfyUI-ID-Lora-Pine",
-        "ver": "51baaa30c4541356991aadc886eff9e4c225ed98",
-        "Node name for S&R": "IDLoRAGuider"
-      },
-      "widgets_values": [
-        3,
-        4.5,
-        8
-      ]
-    },
-    {
       "id": 5221,
       "type": "LoraLoaderModelOnly",
       "pos": [
@@ -4008,72 +3870,6 @@
       "bgcolor": "#533"
     },
     {
-      "id": 5254,
-      "type": "VHS_VideoCombine",
-      "pos": [
-        -468.4656358198919,
-        3899.386255573619
-      ],
-      "size": [
-        210,
-        238
-      ],
-      "flags": {},
-      "order": 96,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 14051
-        },
-        {
-          "name": "audio",
-          "shape": 7,
-          "type": "AUDIO",
-          "link": 14052
-        },
-        {
-          "name": "meta_batch",
-          "shape": 7,
-          "type": "VHS_BatchManager",
-          "link": null
-        },
-        {
-          "name": "vae",
-          "shape": 7,
-          "type": "VAE",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Filenames",
-          "type": "VHS_FILENAMES",
-          "links": null
-        }
-      ],
-      "title": "Preview",
-      "properties": {
-        "cnr_id": "comfyui-videohelpersuite",
-        "ver": "449839959f0153fb8a57211a9364c55163935ca9",
-        "Node name for S&R": "VHS_VideoCombine"
-      },
-      "widgets_values": {
-        "frame_rate": 8,
-        "loop_count": 0,
-        "filename_prefix": "AnimateDiff",
-        "format": "image/gif",
-        "pingpong": false,
-        "save_output": true,
-        "videopreview": {
-          "hidden": false,
-          "paused": false,
-          "params": {}
-        }
-      }
-    },
-    {
       "id": 2004,
       "type": "LoadImage",
       "pos": [
@@ -4224,7 +4020,7 @@
       ],
       "size": [
         625.5518346364843,
-        614.5636936576948
+        238
       ],
       "flags": {},
       "order": 105,
@@ -4410,6 +4206,210 @@
         },
         {},
         ""
+      ]
+    },
+    {
+      "id": 5254,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        -468.4656358198919,
+        3899.386255573619
+      ],
+      "size": [
+        210,
+        238
+      ],
+      "flags": {},
+      "order": 96,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 14051
+        },
+        {
+          "name": "audio",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": 14052
+        },
+        {
+          "name": "meta_batch",
+          "shape": 7,
+          "type": "VHS_BatchManager",
+          "link": null
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": null
+        }
+      ],
+      "title": "Preview",
+      "properties": {
+        "cnr_id": "comfyui-videohelpersuite",
+        "ver": "449839959f0153fb8a57211a9364c55163935ca9",
+        "Node name for S&R": "VHS_VideoCombine"
+      },
+      "widgets_values": {
+        "frame_rate": 8,
+        "loop_count": 0,
+        "filename_prefix": "AnimateDiff",
+        "format": "image/gif",
+        "pingpong": false,
+        "save_output": true,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {}
+        }
+      }
+    },
+    {
+      "id": 5167,
+      "type": "IDLoRAGuider",
+      "pos": [
+        -1457.5524573131124,
+        3606.9413232578186
+      ],
+      "size": [
+        270,
+        186
+      ],
+      "flags": {},
+      "order": 81,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 13995
+        },
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 13965
+        },
+        {
+          "name": "negative_cond",
+          "type": "CONDITIONING",
+          "link": 13966
+        },
+        {
+          "name": "joint_latent",
+          "type": "LATENT",
+          "link": 13905
+        },
+        {
+          "name": "id_dropout_cond",
+          "shape": 7,
+          "type": "CONDITIONING",
+          "link": 13964
+        }
+      ],
+      "outputs": [
+        {
+          "name": "guider",
+          "type": "GUIDER",
+          "links": [
+            13852
+          ]
+        },
+        {
+          "name": "joint_latent",
+          "type": "LATENT",
+          "links": [
+            13851
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "pineambassador/ComfyUI-ID-Lora-Pine",
+        "ver": "51baaa30c4541356991aadc886eff9e4c225ed98",
+        "Node name for S&R": "IDLoRAGuider"
+      },
+      "widgets_values": [
+        3,
+        2,
+        2
+      ]
+    },
+    {
+      "id": 5169,
+      "type": "IDLoRAGuider",
+      "pos": [
+        403.8573007914148,
+        3632.229654420362
+      ],
+      "size": [
+        270,
+        186
+      ],
+      "flags": {},
+      "order": 99,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 13857
+        },
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 13967
+        },
+        {
+          "name": "negative_cond",
+          "type": "CONDITIONING",
+          "link": 13968
+        },
+        {
+          "name": "joint_latent",
+          "type": "LATENT",
+          "link": 13918
+        },
+        {
+          "name": "id_dropout_cond",
+          "shape": 7,
+          "type": "CONDITIONING",
+          "link": 13969
+        }
+      ],
+      "outputs": [
+        {
+          "name": "guider",
+          "type": "GUIDER",
+          "links": [
+            13862
+          ]
+        },
+        {
+          "name": "joint_latent",
+          "type": "LATENT",
+          "links": [
+            13863
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "pineambassador/ComfyUI-ID-Lora-Pine",
+        "ver": "51baaa30c4541356991aadc886eff9e4c225ed98",
+        "Node name for S&R": "IDLoRAGuider"
+      },
+      "widgets_values": [
+        1,
+        1,
+        1
       ]
     }
   ],
@@ -5393,10 +5393,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.555991731349225,
+      "scale": 0.23579476910000097,
       "offset": [
-        6929.746217527009,
-        -2375.121930420768
+        8355.864201759696,
+        -1764.5493638933667
       ]
     },
     "frontendVersion": "1.39.19",
