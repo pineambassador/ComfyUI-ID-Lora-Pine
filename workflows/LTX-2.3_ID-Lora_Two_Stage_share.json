@@ -1,8 +1,8 @@
 {
   "id": "394ed254-7306-42a2-9ae6-aa880ce4456d",
   "revision": 0,
-  "last_node_id": 5256,
-  "last_link_id": 14061,
+  "last_node_id": 5257,
+  "last_link_id": 14058,
   "nodes": [
     {
       "id": 4967,
@@ -52,13 +52,13 @@
         66
       ],
       "flags": {},
-      "order": 59,
+      "order": 60,
       "mode": 0,
       "inputs": [
         {
           "name": "image",
           "type": "IMAGE",
-          "link": 13952
+          "link": 14048
         }
       ],
       "outputs": [
@@ -103,7 +103,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 72,
+      "order": 75,
       "mode": 0,
       "inputs": [
         {
@@ -162,7 +162,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 75,
+      "order": 78,
       "mode": 0,
       "inputs": [
         {
@@ -275,48 +275,6 @@
       ],
       "color": "#322",
       "bgcolor": "#533"
-    },
-    {
-      "id": 4848,
-      "type": "LTXVAudioVAEDecode",
-      "pos": [
-        520.0179268326791,
-        4235.944083209637
-      ],
-      "size": [
-        242.46932983398438,
-        46
-      ],
-      "flags": {},
-      "order": 103,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "samples",
-          "type": "LATENT",
-          "link": 13921
-        },
-        {
-          "name": "audio_vae",
-          "type": "VAE",
-          "link": 13790
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Audio",
-          "type": "AUDIO",
-          "links": [
-            14055
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.64",
-        "Node name for S&R": "LTXVAudioVAEDecode"
-      },
-      "widgets_values": []
     },
     {
       "id": 5139,
@@ -465,7 +423,7 @@
         106
       ],
       "flags": {},
-      "order": 64,
+      "order": 67,
       "mode": 0,
       "inputs": [
         {
@@ -489,7 +447,7 @@
         "Node name for S&R": "IDLoRAAudioNoiseInjector"
       },
       "widgets_values": [
-        144913109848518,
+        556380583872106,
         "randomize",
         1
       ]
@@ -506,7 +464,7 @@
         106
       ],
       "flags": {},
-      "order": 53,
+      "order": 56,
       "mode": 0,
       "inputs": [
         {
@@ -556,7 +514,7 @@
         142.01941407870663
       ],
       "flags": {},
-      "order": 54,
+      "order": 57,
       "mode": 0,
       "inputs": [
         {
@@ -635,7 +593,7 @@
         "Node name for S&R": "RandomNoise"
       },
       "widgets_values": [
-        162611128974105,
+        306948441902794,
         "randomize"
       ]
     },
@@ -651,7 +609,7 @@
         102
       ],
       "flags": {},
-      "order": 65,
+      "order": 68,
       "mode": 0,
       "inputs": [
         {
@@ -696,7 +654,7 @@
         61.09117359923539
       ],
       "flags": {},
-      "order": 71,
+      "order": 74,
       "mode": 0,
       "inputs": [
         {
@@ -773,7 +731,7 @@
         122
       ],
       "flags": {},
-      "order": 97,
+      "order": 101,
       "mode": 0,
       "inputs": [
         {
@@ -818,7 +776,7 @@
         106
       ],
       "flags": {},
-      "order": 100,
+      "order": 104,
       "mode": 0,
       "inputs": [
         {
@@ -880,7 +838,7 @@
         46
       ],
       "flags": {},
-      "order": 101,
+      "order": 105,
       "mode": 0,
       "inputs": [
         {
@@ -924,13 +882,13 @@
         26
       ],
       "flags": {},
-      "order": 57,
+      "order": 61,
       "mode": 0,
       "inputs": [
         {
           "name": "",
           "type": "*",
-          "link": 13950
+          "link": 14049
         }
       ],
       "outputs": [
@@ -959,13 +917,13 @@
         26
       ],
       "flags": {},
-      "order": 58,
+      "order": 62,
       "mode": 0,
       "inputs": [
         {
           "name": "",
           "type": "*",
-          "link": 13951
+          "link": 14050
         }
       ],
       "outputs": [
@@ -996,7 +954,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 84,
+      "order": 88,
       "mode": 0,
       "inputs": [
         {
@@ -1082,7 +1040,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 79,
+      "order": 82,
       "mode": 0,
       "inputs": [
         {
@@ -1122,7 +1080,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 78,
+      "order": 81,
       "mode": 0,
       "inputs": [
         {
@@ -1206,7 +1164,7 @@
         61.09117359923539
       ],
       "flags": {},
-      "order": 98,
+      "order": 102,
       "mode": 0,
       "inputs": [
         {
@@ -1350,7 +1308,7 @@
         246
       ],
       "flags": {},
-      "order": 88,
+      "order": 92,
       "mode": 0,
       "inputs": [
         {
@@ -1379,7 +1337,7 @@
         246
       ],
       "flags": {},
-      "order": 82,
+      "order": 86,
       "mode": 0,
       "inputs": [
         {
@@ -1582,7 +1540,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 46,
+      "order": 49,
       "mode": 0,
       "inputs": [
         {
@@ -1634,7 +1592,7 @@
         252.0105071831995
       ],
       "flags": {},
-      "order": 86,
+      "order": 90,
       "mode": 0,
       "inputs": [
         {
@@ -1685,53 +1643,6 @@
       "widgets_values": []
     },
     {
-      "id": 4851,
-      "type": "VAEDecodeTiled",
-      "pos": [
-        510.017926832679,
-        3995.944083209638
-      ],
-      "size": [
-        270,
-        150
-      ],
-      "flags": {},
-      "order": 104,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "samples",
-          "type": "LATENT",
-          "link": 13998
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "link": 13789
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            14054
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.14.1",
-        "Node name for S&R": "VAEDecodeTiled"
-      },
-      "widgets_values": [
-        512,
-        64,
-        512,
-        4
-      ]
-    },
-    {
       "id": 5224,
       "type": "easy cleanGpuUsed",
       "pos": [
@@ -1743,7 +1654,7 @@
         26
       ],
       "flags": {},
-      "order": 102,
+      "order": 106,
       "mode": 0,
       "inputs": [
         {
@@ -1780,7 +1691,7 @@
         46
       ],
       "flags": {},
-      "order": 90,
+      "order": 94,
       "mode": 0,
       "inputs": [
         {
@@ -1826,7 +1737,7 @@
         26
       ],
       "flags": {},
-      "order": 93,
+      "order": 97,
       "mode": 0,
       "inputs": [
         {
@@ -2015,44 +1926,110 @@
       "bgcolor": "#653"
     },
     {
-      "id": 5141,
-      "type": "SetNode",
+      "id": 2483,
+      "type": "CLIPTextEncode",
       "pos": [
-        -5178.665922609928,
-        3704.5336306547374
+        -3650,
+        3300
       ],
       "size": [
-        210,
-        60
+        307.2346496582031,
+        204.2556610107422
       ],
       "flags": {
         "collapsed": true
       },
-      "order": 49,
+      "order": 63,
       "mode": 0,
       "inputs": [
         {
-          "name": "CLIP",
+          "name": "clip",
           "type": "CLIP",
-          "link": 14001
+          "link": 13793
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": 14057
         }
       ],
       "outputs": [
         {
-          "name": "*",
-          "type": "*",
-          "links": null
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "slot_index": 0,
+          "links": [
+            7065
+          ]
         }
       ],
-      "title": "Set_clip",
+      "title": "CLIP Text Encode (Positive Prompt)",
       "properties": {
-        "previousName": "clip"
+        "cnr_id": "comfy-core",
+        "ver": "0.3.28",
+        "Node name for S&R": "CLIPTextEncode"
       },
       "widgets_values": [
-        "clip"
+        "This scene captures a candid, intimate moment during an interview with Danielle Rose Russell from the perspective of the man. She is undressing in front of him while seated on the other side of a wooden desk in the foreground.  The man's hands extend out clasped casually on the desk as he watches her.  The quaint office-style setting is indoors where the actress, known for her slender figure and long wavy brunette hair, sits on a simple folding chair. Despite wearing only a white bra and panties, she has crossed one leg over the other and folded her arms protectively across her chest to maintain some modesty. The fair complexion of the actress adds to her radiant beauty yet her anxious expression conveys an air of discomfort. In this poignant moment during the interview, a middle-aged soft-figured man off camera tells her in a soft but firm tone \"now your bra, please\".  as she reluctantly begins to remove her bra, Danielle Rose Russell nervously trails off mid-sentence with a partial thought while uttering with a timid tone, \"...I don't...\".  He calmy reassures her \"that's it...good girl.\"  She reaches behind to unclasp the bra behind her back and then relucantly pulls the bra away by the straps at her shoulders.\n\nThe image is rendered in high definition and captured using a cinematic camera angle from across the room, showcasing Russell's delicate features and her subtle body language. The dim lighting and harsh shadows adds an intimate touch while emphasizing the emotional complexity of the moment."
       ],
-      "color": "#432",
-      "bgcolor": "#653"
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 2612,
+      "type": "CLIPTextEncode",
+      "pos": [
+        -3650,
+        3340
+      ],
+      "size": [
+        327.8443419983205,
+        117.23972533000051
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 64,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 13794
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": 14058
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "slot_index": 0,
+          "links": [
+            7652
+          ]
+        }
+      ],
+      "title": "CLIP Text Encode (Negative Prompt)",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.28",
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "pc game, console game, video game, cartoon, childish, ugly"
+      ],
+      "color": "#322",
+      "bgcolor": "#533"
     },
     {
       "id": 5133,
@@ -2068,7 +2045,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 50,
+      "order": 53,
       "mode": 0,
       "inputs": [
         {
@@ -2108,7 +2085,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 48,
+      "order": 51,
       "mode": 0,
       "inputs": [
         {
@@ -2148,7 +2125,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 51,
+      "order": 54,
       "mode": 0,
       "inputs": [
         {
@@ -2253,7 +2230,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 55,
+      "order": 58,
       "mode": 0,
       "inputs": [
         {
@@ -2293,7 +2270,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 52,
+      "order": 55,
       "mode": 0,
       "inputs": [
         {
@@ -2402,7 +2379,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 66,
+      "order": 69,
       "mode": 0,
       "inputs": [
         {
@@ -2463,7 +2440,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 67,
+      "order": 70,
       "mode": 0,
       "inputs": [
         {
@@ -2524,7 +2501,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 74,
+      "order": 77,
       "mode": 0,
       "inputs": [
         {
@@ -2610,7 +2587,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 73,
+      "order": 76,
       "mode": 0,
       "inputs": [
         {
@@ -2650,7 +2627,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 76,
+      "order": 79,
       "mode": 0,
       "inputs": [
         {
@@ -2756,7 +2733,7 @@
         46
       ],
       "flags": {},
-      "order": 83,
+      "order": 87,
       "mode": 0,
       "inputs": [
         {
@@ -2834,7 +2811,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 87,
+      "order": 91,
       "mode": 0,
       "inputs": [
         {
@@ -2872,7 +2849,7 @@
         46
       ],
       "flags": {},
-      "order": 89,
+      "order": 93,
       "mode": 0,
       "inputs": [
         {
@@ -2916,7 +2893,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 91,
+      "order": 95,
       "mode": 0,
       "inputs": [
         {
@@ -2954,7 +2931,7 @@
         74.19873696174136
       ],
       "flags": {},
-      "order": 95,
+      "order": 99,
       "mode": 0,
       "inputs": [
         {
@@ -3037,7 +3014,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 56,
+      "order": 59,
       "mode": 0,
       "inputs": [
         {
@@ -3141,7 +3118,7 @@
       "flags": {
         "collapsed": true
       },
-      "order": 85,
+      "order": 89,
       "mode": 0,
       "inputs": [
         {
@@ -3202,7 +3179,7 @@
         78
       ],
       "flags": {},
-      "order": 68,
+      "order": 71,
       "mode": 0,
       "inputs": [
         {
@@ -3253,48 +3230,6 @@
       ]
     },
     {
-      "id": 5036,
-      "type": "VAEDecode",
-      "pos": [
-        -716.2961010871,
-        3225.715733124858
-      ],
-      "size": [
-        140,
-        46
-      ],
-      "flags": {},
-      "order": 92,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "samples",
-          "type": "LATENT",
-          "link": 13906
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "link": 13787
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            14051
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.16.0",
-        "Node name for S&R": "VAEDecode"
-      },
-      "widgets_values": []
-    },
-    {
       "id": 5157,
       "type": "LTXVAudioVAEDecode",
       "pos": [
@@ -3306,7 +3241,7 @@
         46
       ],
       "flags": {},
-      "order": 94,
+      "order": 98,
       "mode": 0,
       "inputs": [
         {
@@ -3325,7 +3260,7 @@
           "name": "Audio",
           "type": "AUDIO",
           "links": [
-            14052
+            13825
           ]
         }
       ],
@@ -3392,7 +3327,7 @@
           "name": "FLOAT",
           "type": "FLOAT",
           "links": [
-            14056
+            14015
           ]
         }
       ],
@@ -3403,6 +3338,29 @@
       ],
       "color": "#232",
       "bgcolor": "#353"
+    },
+    {
+      "id": 5212,
+      "type": "Note",
+      "pos": [
+        -6482.889076327193,
+        2704.3310794210975
+      ],
+      "size": [
+        831.8793776140587,
+        326.0715268604854
+      ],
+      "flags": {},
+      "order": 37,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "TLDR\nImplemenation in comfyui based on project here: https://github.com/ID-LoRA/ID-LoRA\n\nYou Need:\nID Lora - from site above\nReference: First frame image (or video with num frames div by 8 + 1, ie 9, 17 frames)\nReference: Audio clip with 3-5s of audio, make sure you set the sample rate of the clip to match the source.\n\nPrompt formatted into the expected format\n\n\nCustom nodes\nIDLoRAGuider - audio and video conditioning to anchor output to reference image/audio\nIDLoRAPrepareVideo - sort of like img to video, but treats the source more like an anchor with a look-back feature of the lora\nIDLoRAPromptFormatter - help format the prompt properly to what the model wants\nIDLoRAAudioNoiseInjector - ensure the ltxvemptyaudiolatent output is suitable for audio \nIDLoRAPrepareAudioReference - take an audio sample input and output conditioning for generation\n\nGuider CFG values\nCFG - overall strength 2-5\nID_CFG - strength to reproduce the likeness 2-5\nAUDIO_CFG - strength to reproduce the pitch/tone of the audio sample\n\n"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
     },
     {
       "id": 5249,
@@ -3416,7 +3374,7 @@
         163.24184589474316
       ],
       "flags": {},
-      "order": 37,
+      "order": 38,
       "mode": 0,
       "inputs": [],
       "outputs": [],
@@ -3439,7 +3397,7 @@
         106
       ],
       "flags": {},
-      "order": 45,
+      "order": 48,
       "mode": 0,
       "inputs": [
         {
@@ -3480,7 +3438,7 @@
         61.22112545115306
       ],
       "flags": {},
-      "order": 38,
+      "order": 39,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -3502,848 +3460,6 @@
       ]
     },
     {
-      "id": 4831,
-      "type": "KSamplerSelect",
-      "pos": [
-        -1619.410874974159,
-        3341.0752674157407
-      ],
-      "size": [
-        270,
-        74
-      ],
-      "flags": {},
-      "order": 39,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "SAMPLER",
-          "type": "SAMPLER",
-          "links": [
-            13090
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.14.1",
-        "Node name for S&R": "KSamplerSelect"
-      },
-      "widgets_values": [
-        "euler_ancestral_cfg_pp"
-      ]
-    },
-    {
-      "id": 5184,
-      "type": "BasicScheduler",
-      "pos": [
-        -1102.2430991627352,
-        3701.656336899418
-      ],
-      "size": [
-        270,
-        106
-      ],
-      "flags": {},
-      "order": 62,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 13994
-        }
-      ],
-      "outputs": [
-        {
-          "name": "SIGMAS",
-          "type": "SIGMAS",
-          "links": [
-            13900
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.16.0",
-        "Node name for S&R": "BasicScheduler"
-      },
-      "widgets_values": [
-        "sgm_uniform",
-        30,
-        0.95
-      ]
-    },
-    {
-      "id": 4988,
-      "type": "PrimitiveInt",
-      "pos": [
-        -6457.134900472294,
-        3796.3247832088628
-      ],
-      "size": [
-        270,
-        82
-      ],
-      "flags": {},
-      "order": 40,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "INT",
-          "type": "INT",
-          "links": [
-            14009
-          ]
-        }
-      ],
-      "title": "number of frames",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.16.0",
-        "Node name for S&R": "PrimitiveInt"
-      },
-      "widgets_values": [
-        121,
-        "fixed"
-      ]
-    },
-    {
-      "id": 5199,
-      "type": "IDLoRAPrepareAudioReference",
-      "pos": [
-        -3025.785046397974,
-        3669.10754926195
-      ],
-      "size": [
-        306.0000061035156,
-        146
-      ],
-      "flags": {},
-      "order": 77,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "conditioning",
-          "type": "CONDITIONING",
-          "link": 13953
-        },
-        {
-          "name": "audio",
-          "type": "AUDIO",
-          "link": 14025
-        },
-        {
-          "name": "audio_vae",
-          "type": "VAE",
-          "link": 13955
-        }
-      ],
-      "outputs": [
-        {
-          "name": "positive",
-          "type": "CONDITIONING",
-          "links": [
-            13963
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "pineambassador/ComfyUI-ID-Lora-Pine",
-        "ver": "51baaa30c4541356991aadc886eff9e4c225ed98",
-        "Node name for S&R": "IDLoRAPrepareAudioReference"
-      },
-      "widgets_values": [
-        48000,
-        1
-      ]
-    },
-    {
-      "id": 5007,
-      "type": "LoadAudio",
-      "pos": [
-        -4513.494408186057,
-        3984.6579298208803
-      ],
-      "size": [
-        282.7333297729492,
-        136
-      ],
-      "flags": {},
-      "order": 41,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "AUDIO",
-          "type": "AUDIO",
-          "links": [
-            14024
-          ]
-        }
-      ],
-      "title": "Audio Reference Clip",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.16.0",
-        "Node name for S&R": "LoadAudio"
-      },
-      "widgets_values": [
-        "audio001 (1).m4a",
-        null,
-        null
-      ]
-    },
-    {
-      "id": 5221,
-      "type": "LoraLoaderModelOnly",
-      "pos": [
-        -4129.147353754553,
-        3593.030982324097
-      ],
-      "size": [
-        321.22427898826436,
-        88.46071987239384
-      ],
-      "flags": {},
-      "order": 70,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 14061
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            14042
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.16.0",
-        "Node name for S&R": "LoraLoaderModelOnly"
-      },
-      "widgets_values": [
-        "ltx2/other/ltx-2.3-22b-distilled-lora-384.safetensors",
-        0.5
-      ]
-    },
-    {
-      "id": 5144,
-      "type": "SetNode",
-      "pos": [
-        -3962.942529514353,
-        3736.544791837943
-      ],
-      "size": [
-        210,
-        60
-      ],
-      "flags": {
-        "collapsed": true
-      },
-      "order": 80,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "link": 14042
-        }
-      ],
-      "outputs": [
-        {
-          "name": "*",
-          "type": "*",
-          "links": null
-        }
-      ],
-      "title": "Set_highres_model",
-      "properties": {
-        "previousName": "highres_model"
-      },
-      "widgets_values": [
-        "highres_model"
-      ],
-      "color": "#223",
-      "bgcolor": "#335"
-    },
-    {
-      "id": 5143,
-      "type": "SetNode",
-      "pos": [
-        -4184.751582791458,
-        3460.566522731178
-      ],
-      "size": [
-        210,
-        60
-      ],
-      "flags": {
-        "collapsed": true
-      },
-      "order": 69,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "link": 14060
-        }
-      ],
-      "outputs": [
-        {
-          "name": "*",
-          "type": "*",
-          "links": []
-        }
-      ],
-      "title": "Set_lowres_model",
-      "properties": {
-        "previousName": "lowres_model"
-      },
-      "widgets_values": [
-        "lowres_model"
-      ],
-      "color": "#223",
-      "bgcolor": "#335"
-    },
-    {
-      "id": 2612,
-      "type": "CLIPTextEncode",
-      "pos": [
-        -3605.0353025226987,
-        3463.4485330740454
-      ],
-      "size": [
-        327.8443419983205,
-        117.23972533000051
-      ],
-      "flags": {
-        "collapsed": true
-      },
-      "order": 61,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "clip",
-          "type": "CLIP",
-          "link": 13794
-        },
-        {
-          "name": "text",
-          "type": "STRING",
-          "widget": {
-            "name": "text"
-          },
-          "link": 14050
-        }
-      ],
-      "outputs": [
-        {
-          "name": "CONDITIONING",
-          "type": "CONDITIONING",
-          "slot_index": 0,
-          "links": [
-            7652
-          ]
-        }
-      ],
-      "title": "CLIP Text Encode (Negative Prompt)",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.28",
-        "Node name for S&R": "CLIPTextEncode"
-      },
-      "widgets_values": [
-        "pc game, console game, video game, cartoon, childish, ugly"
-      ],
-      "color": "#322",
-      "bgcolor": "#533"
-    },
-    {
-      "id": 2004,
-      "type": "LoadImage",
-      "pos": [
-        -5504.200334267455,
-        4002.1804737372668
-      ],
-      "size": [
-        274.080078125,
-        314.000244140625
-      ],
-      "flags": {},
-      "order": 42,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            11002,
-            13950,
-            13951,
-            13952
-          ]
-        },
-        {
-          "name": "MASK",
-          "type": "MASK",
-          "links": []
-        }
-      ],
-      "title": "Starting Image",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.56",
-        "Node name for S&R": "LoadImage"
-      },
-      "widgets_values": [
-        "image_00026_.png",
-        "image"
-      ]
-    },
-    {
-      "id": 5253,
-      "type": "IDLoRAPromptFormatter",
-      "pos": [
-        -6020.22803175343,
-        3193.0623353434876
-      ],
-      "size": [
-        400,
-        402
-      ],
-      "flags": {},
-      "order": 43,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "positive_prompt",
-          "type": "STRING",
-          "links": [
-            14053
-          ]
-        },
-        {
-          "name": "negative_prompt",
-          "type": "STRING",
-          "links": [
-            14050
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "pineambassador/ComfyUI-ID-Lora-Pine",
-        "ver": "51baaa30c4541356991aadc886eff9e4c225ed98",
-        "Node name for S&R": "IDLoRAPromptFormatter"
-      },
-      "widgets_values": [
-        "[NAME]",
-        "a middle-aged man with a kind face",
-        "",
-        "nodding slowly while looking at the camera",
-        "I think we've finally found the solution.",
-        "soft rain",
-        "low quality, blurry..."
-      ]
-    },
-    {
-      "id": 2483,
-      "type": "CLIPTextEncode",
-      "pos": [
-        -3650,
-        3300
-      ],
-      "size": [
-        307.2346496582031,
-        204.2556610107422
-      ],
-      "flags": {
-        "collapsed": true
-      },
-      "order": 60,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "clip",
-          "type": "CLIP",
-          "link": 13793
-        },
-        {
-          "name": "text",
-          "type": "STRING",
-          "widget": {
-            "name": "text"
-          },
-          "link": 14053
-        }
-      ],
-      "outputs": [
-        {
-          "name": "CONDITIONING",
-          "type": "CONDITIONING",
-          "slot_index": 0,
-          "links": [
-            7065
-          ]
-        }
-      ],
-      "title": "CLIP Text Encode (Positive Prompt)",
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.28",
-        "Node name for S&R": "CLIPTextEncode"
-      },
-      "widgets_values": [
-        ""
-      ],
-      "color": "#232",
-      "bgcolor": "#353"
-    },
-    {
-      "id": 5255,
-      "type": "VHS_VideoCombine",
-      "pos": [
-        884.7336003600259,
-        3905.6458524470368
-      ],
-      "size": [
-        625.5518346364843,
-        238
-      ],
-      "flags": {},
-      "order": 105,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 14054
-        },
-        {
-          "name": "audio",
-          "shape": 7,
-          "type": "AUDIO",
-          "link": 14055
-        },
-        {
-          "name": "meta_batch",
-          "shape": 7,
-          "type": "VHS_BatchManager",
-          "link": null
-        },
-        {
-          "name": "vae",
-          "shape": 7,
-          "type": "VAE",
-          "link": null
-        },
-        {
-          "name": "frame_rate",
-          "type": "FLOAT",
-          "widget": {
-            "name": "frame_rate"
-          },
-          "link": 14056
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Filenames",
-          "type": "VHS_FILENAMES",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-videohelpersuite",
-        "ver": "449839959f0153fb8a57211a9364c55163935ca9",
-        "Node name for S&R": "VHS_VideoCombine"
-      },
-      "widgets_values": {
-        "frame_rate": 8,
-        "loop_count": 0,
-        "filename_prefix": "AnimateDiff",
-        "format": "image/gif",
-        "pingpong": false,
-        "save_output": true,
-        "videopreview": {
-          "hidden": false,
-          "paused": false,
-          "params": {}
-        }
-      }
-    },
-    {
-      "id": 5212,
-      "type": "Note",
-      "pos": [
-        -6482.889076327193,
-        2704.3310794210975
-      ],
-      "size": [
-        831.8793776140587,
-        326.0715268604854
-      ],
-      "flags": {},
-      "order": 44,
-      "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "properties": {},
-      "widgets_values": [
-        "TLDR\nImplemenation in comfyui based on project here: https://github.com/ID-LoRA/ID-LoRA\n\nIn short, standard I2V will tend to drift away from the likeness over time. This methodology aims to produce more of a constant anchor for the reference image, and audio.\n\nYou Need:\nID Lora - from site above\nReference: First frame image (or video with num frames div by 8 + 1, ie 9, 17 frames)\nReference: Audio clip with 2-5s of audio, make sure you set the sample rate of the clip to match the source.\n\nPrompt formatted into the expected format\n\n\nCustom nodes\nIDLoRAGuider - audio and video conditioning to anchor output to reference image/audio\nIDLoRAPrepareVideo - sort of like img to video, but treats the source more like an anchor with a look-back feature of the lora\nIDLoRAPromptFormatter - help format the prompt properly to what the model wants\nIDLoRAAudioNoiseInjector - ensure the ltxvemptyaudiolatent output is suitable for audio \nIDLoRAPrepareAudioReference - take an audio sample input and output conditioning for generation\n\nGuider CFG values\nCFG - overall strength 2-5\nID_CFG - strength to reproduce the likeness 2-5\nAUDIO_CFG - strength to reproduce the pitch/tone of the audio sample\n\n"
-      ],
-      "color": "#432",
-      "bgcolor": "#653"
-    },
-    {
-      "id": 5250,
-      "type": "LoraLoaderModelOnly",
-      "pos": [
-        -4555.091257055557,
-        3196.026292896861
-      ],
-      "size": [
-        312.45615916144425,
-        111.07323942577159
-      ],
-      "flags": {},
-      "order": 47,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 14034
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            14059
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.16.0",
-        "Node name for S&R": "LoraLoaderModelOnly"
-      },
-      "widgets_values": [
-        "ltx2/other/ID-LoRA-TalkVid.safetensors",
-        1
-      ]
-    },
-    {
-      "id": 5256,
-      "type": "Power Lora Loader (rgthree)",
-      "pos": [
-        -4587.9847729090525,
-        3366.1438628205333
-      ],
-      "size": [
-        340.40001068115237,
-        118
-      ],
-      "flags": {},
-      "order": 63,
-      "mode": 0,
-      "inputs": [
-        {
-          "dir": 3,
-          "name": "model",
-          "type": "MODEL",
-          "link": 14059
-        },
-        {
-          "dir": 3,
-          "name": "clip",
-          "type": "CLIP",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "dir": 4,
-          "name": "MODEL",
-          "shape": 3,
-          "type": "MODEL",
-          "links": [
-            14060,
-            14061
-          ]
-        },
-        {
-          "dir": 4,
-          "name": "CLIP",
-          "shape": 3,
-          "type": "CLIP",
-          "links": null
-        }
-      ],
-      "properties": {
-        "cnr_id": "rgthree-comfy",
-        "ver": "1.0.2512112053",
-        "Show Strengths": "Single Strength"
-      },
-      "widgets_values": [
-        {},
-        {
-          "type": "PowerLoraLoaderHeaderWidget"
-        },
-        {},
-        ""
-      ]
-    },
-    {
-      "id": 5254,
-      "type": "VHS_VideoCombine",
-      "pos": [
-        -468.4656358198919,
-        3899.386255573619
-      ],
-      "size": [
-        210,
-        238
-      ],
-      "flags": {},
-      "order": 96,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 14051
-        },
-        {
-          "name": "audio",
-          "shape": 7,
-          "type": "AUDIO",
-          "link": 14052
-        },
-        {
-          "name": "meta_batch",
-          "shape": 7,
-          "type": "VHS_BatchManager",
-          "link": null
-        },
-        {
-          "name": "vae",
-          "shape": 7,
-          "type": "VAE",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "Filenames",
-          "type": "VHS_FILENAMES",
-          "links": null
-        }
-      ],
-      "title": "Preview",
-      "properties": {
-        "cnr_id": "comfyui-videohelpersuite",
-        "ver": "449839959f0153fb8a57211a9364c55163935ca9",
-        "Node name for S&R": "VHS_VideoCombine"
-      },
-      "widgets_values": {
-        "frame_rate": 8,
-        "loop_count": 0,
-        "filename_prefix": "AnimateDiff",
-        "format": "image/gif",
-        "pingpong": false,
-        "save_output": true,
-        "videopreview": {
-          "hidden": false,
-          "paused": false,
-          "params": {}
-        }
-      }
-    },
-    {
-      "id": 5167,
-      "type": "IDLoRAGuider",
-      "pos": [
-        -1457.5524573131124,
-        3606.9413232578186
-      ],
-      "size": [
-        270,
-        186
-      ],
-      "flags": {},
-      "order": 81,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 13995
-        },
-        {
-          "name": "conditioning",
-          "type": "CONDITIONING",
-          "link": 13965
-        },
-        {
-          "name": "negative_cond",
-          "type": "CONDITIONING",
-          "link": 13966
-        },
-        {
-          "name": "joint_latent",
-          "type": "LATENT",
-          "link": 13905
-        },
-        {
-          "name": "id_dropout_cond",
-          "shape": 7,
-          "type": "CONDITIONING",
-          "link": 13964
-        }
-      ],
-      "outputs": [
-        {
-          "name": "guider",
-          "type": "GUIDER",
-          "links": [
-            13852
-          ]
-        },
-        {
-          "name": "joint_latent",
-          "type": "LATENT",
-          "links": [
-            13851
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "pineambassador/ComfyUI-ID-Lora-Pine",
-        "ver": "51baaa30c4541356991aadc886eff9e4c225ed98",
-        "Node name for S&R": "IDLoRAGuider"
-      },
-      "widgets_values": [
-        3,
-        2,
-        2
-      ]
-    },
-    {
       "id": 5169,
       "type": "IDLoRAGuider",
       "pos": [
@@ -4355,7 +3471,7 @@
         186
       ],
       "flags": {},
-      "order": 99,
+      "order": 103,
       "mode": 0,
       "inputs": [
         {
@@ -4407,9 +3523,1327 @@
         "Node name for S&R": "IDLoRAGuider"
       },
       "widgets_values": [
+        1.5,
+        2.5,
+        3.5
+      ]
+    },
+    {
+      "id": 4831,
+      "type": "KSamplerSelect",
+      "pos": [
+        -1619.410874974159,
+        3341.0752674157407
+      ],
+      "size": [
+        270,
+        74
+      ],
+      "flags": {},
+      "order": 40,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "SAMPLER",
+          "type": "SAMPLER",
+          "links": [
+            13090
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.14.1",
+        "Node name for S&R": "KSamplerSelect"
+      },
+      "widgets_values": [
+        "euler_ancestral_cfg_pp"
+      ]
+    },
+    {
+      "id": 5184,
+      "type": "BasicScheduler",
+      "pos": [
+        -1102.2430991627352,
+        3701.656336899418
+      ],
+      "size": [
+        270,
+        106
+      ],
+      "flags": {},
+      "order": 65,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 13994
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SIGMAS",
+          "type": "SIGMAS",
+          "links": [
+            13900
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.16.0",
+        "Node name for S&R": "BasicScheduler"
+      },
+      "widgets_values": [
+        "sgm_uniform",
+        30,
+        0.95
+      ]
+    },
+    {
+      "id": 5144,
+      "type": "SetNode",
+      "pos": [
+        -3962.942529514353,
+        3736.544791837943
+      ],
+      "size": [
+        210,
+        60
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 83,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "link": 14032
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "title": "Set_highres_model",
+      "properties": {
+        "previousName": "highres_model"
+      },
+      "widgets_values": [
+        "highres_model"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
+    },
+    {
+      "id": 5221,
+      "type": "LoraLoaderModelOnly",
+      "pos": [
+        -4129.147353754553,
+        3593.030982324097
+      ],
+      "size": [
+        321.22427898826436,
+        88.46071987239384
+      ],
+      "flags": {},
+      "order": 72,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 14055
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            14032
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.16.0",
+        "Node name for S&R": "LoraLoaderModelOnly"
+      },
+      "widgets_values": [
+        "ltx2/other/ltx-2.3-22b-distilled-lora-384.safetensors",
+        0.5
+      ]
+    },
+    {
+      "id": 5251,
+      "type": "Note",
+      "pos": [
+        -4508.566773234807,
+        2880.2485901882083
+      ],
+      "size": [
+        350.6143664266601,
+        198.54175291531283
+      ],
+      "flags": {},
+      "order": 41,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "lora optimizer is optional, but trained loras do step on each other, so I recommend it\n\nusing no distill on the high denoise lowres pass let's the id-lora do its thing without interference \n\nusing distill on the low denoise highres pass on the other hand really helps to add those final details, like skin.  "
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 5036,
+      "type": "VAEDecode",
+      "pos": [
+        -716.2961010871,
+        3225.715733124858
+      ],
+      "size": [
+        140,
+        46
+      ],
+      "flags": {},
+      "order": 96,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 13906
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 13787
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            13822
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.16.0",
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 4999,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        1551.4404578531291,
+        4255.1582445260065
+      ],
+      "size": [
+        1329.6431415846307,
+        334
+      ],
+      "flags": {},
+      "order": 109,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 14046
+        },
+        {
+          "name": "audio",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": 14047
+        },
+        {
+          "name": "meta_batch",
+          "shape": 7,
+          "type": "VHS_BatchManager",
+          "link": null
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        },
+        {
+          "name": "frame_rate",
+          "type": "FLOAT",
+          "widget": {
+            "name": "frame_rate"
+          },
+          "link": 14015
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-videohelpersuite",
+        "ver": "993082e4f2473bf4acaf06f51e33877a7eb38960",
+        "Node name for S&R": "VHS_VideoCombine"
+      },
+      "widgets_values": {
+        "frame_rate": 8,
+        "loop_count": 0,
+        "filename_prefix": "ltx2/vid",
+        "format": "video/h264-mp4",
+        "pix_fmt": "yuv420p",
+        "crf": 19,
+        "save_metadata": true,
+        "trim_to_audio": false,
+        "pingpong": false,
+        "save_output": true,
+        "videopreview": {
+          "hidden": false,
+          "paused": true,
+          "params": {
+            "filename": "",
+            "subfolder": "ltx2",
+            "type": "output",
+            "format": "video/h264-mp4",
+            "frame_rate": 24,
+            "workflow": "",
+            "fullpath": ""
+          }
+        }
+      }
+    },
+    {
+      "id": 4988,
+      "type": "PrimitiveInt",
+      "pos": [
+        -6457.134900472294,
+        3796.3247832088628
+      ],
+      "size": [
+        270,
+        82
+      ],
+      "flags": {},
+      "order": 42,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            14009
+          ]
+        }
+      ],
+      "title": "number of frames",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.16.0",
+        "Node name for S&R": "PrimitiveInt"
+      },
+      "widgets_values": [
+        240,
+        "fixed"
+      ]
+    },
+    {
+      "id": 5143,
+      "type": "SetNode",
+      "pos": [
+        -4168.741457467671,
+        3508.947623495602
+      ],
+      "size": [
+        210,
+        60
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 73,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "link": 14056
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            14045
+          ]
+        }
+      ],
+      "title": "Set_lowres_model",
+      "properties": {
+        "previousName": "lowres_model"
+      },
+      "widgets_values": [
+        "lowres_model"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
+    },
+    {
+      "id": 5254,
+      "type": "easy cleanGpuUsed",
+      "pos": [
+        -3946.620268922325,
+        3487.1307567436716
+      ],
+      "size": [
+        161.36666717529297,
+        26
+      ],
+      "flags": {},
+      "order": 84,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "type": "*",
+          "link": 14045
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-easy-use",
+        "ver": "1.3.5",
+        "Node name for S&R": "easy cleanGpuUsed"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 4851,
+      "type": "VAEDecodeTiled",
+      "pos": [
+        510.017926832679,
+        3995.944083209638
+      ],
+      "size": [
+        270,
+        150
+      ],
+      "flags": {},
+      "order": 108,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 13998
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 13789
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            14046
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.14.1",
+        "Node name for S&R": "VAEDecodeTiled"
+      },
+      "widgets_values": [
+        512,
+        64,
+        512,
+        4
+      ]
+    },
+    {
+      "id": 4848,
+      "type": "LTXVAudioVAEDecode",
+      "pos": [
+        520.0179268326791,
+        4235.944083209637
+      ],
+      "size": [
+        242.46932983398438,
+        46
+      ],
+      "flags": {},
+      "order": 107,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 13921
+        },
+        {
+          "name": "audio_vae",
+          "type": "VAE",
+          "link": 13790
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Audio",
+          "type": "AUDIO",
+          "links": [
+            14047
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.64",
+        "Node name for S&R": "LTXVAudioVAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 5156,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        -506.5507345831662,
+        3926.5898975473865
+      ],
+      "size": [
+        536.6586115481664,
+        334
+      ],
+      "flags": {},
+      "order": 100,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 13822
+        },
+        {
+          "name": "audio",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": 13825
+        },
+        {
+          "name": "meta_batch",
+          "shape": 7,
+          "type": "VHS_BatchManager",
+          "link": null
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": null
+        }
+      ],
+      "title": "Preview",
+      "properties": {
+        "cnr_id": "comfyui-videohelpersuite",
+        "ver": "449839959f0153fb8a57211a9364c55163935ca9",
+        "Node name for S&R": "VHS_VideoCombine"
+      },
+      "widgets_values": {
+        "frame_rate": 24,
+        "loop_count": 0,
+        "filename_prefix": "AnimateDiff",
+        "format": "video/webm",
+        "pix_fmt": "yuv420p",
+        "crf": 20,
+        "save_metadata": true,
+        "trim_to_audio": false,
+        "pingpong": false,
+        "save_output": false,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {
+            "filename": "",
+            "subfolder": "",
+            "type": "temp",
+            "format": "video/webm",
+            "frame_rate": 24,
+            "workflow": "",
+            "fullpath": ""
+          }
+        }
+      }
+    },
+    {
+      "id": 2004,
+      "type": "LoadImage",
+      "pos": [
+        -5509.9231139463855,
+        4524.588504428091
+      ],
+      "size": [
+        274.080078125,
+        314.000244140625
+      ],
+      "flags": {},
+      "order": 43,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            11002
+          ]
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": []
+        }
+      ],
+      "title": "Starting Image",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.56",
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "00002-1238666570-_detail_, a b3ckyqu1ck woman wearing a blue dress holding up a card with a caption on it that reads capitalist.png",
+        "image"
+      ]
+    },
+    {
+      "id": 5141,
+      "type": "SetNode",
+      "pos": [
+        -5171.295164195508,
+        3687.949424222294
+      ],
+      "size": [
+        210,
+        60
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 52,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "link": 14001
+        }
+      ],
+      "outputs": [
+        {
+          "name": "*",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "title": "Set_clip",
+      "properties": {
+        "previousName": "clip"
+      },
+      "widgets_values": [
+        "clip"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 5250,
+      "type": "LoraLoaderModelOnly",
+      "pos": [
+        -4118.631938158606,
+        3166.354298273312
+      ],
+      "size": [
+        312.45615916144425,
+        111.07323942577159
+      ],
+      "flags": {},
+      "order": 50,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 14034
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            14054
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.16.0",
+        "Node name for S&R": "LoraLoaderModelOnly"
+      },
+      "widgets_values": [
+        "ltx2/other/ID-LoRA-TalkVid.safetensors",
+        1
+      ]
+    },
+    {
+      "id": 5007,
+      "type": "LoadAudio",
+      "pos": [
+        -4513.494408186057,
+        3984.6579298208803
+      ],
+      "size": [
+        282.7333297729492,
+        136
+      ],
+      "flags": {},
+      "order": 44,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "AUDIO",
+          "type": "AUDIO",
+          "links": [
+            14024
+          ]
+        }
+      ],
+      "title": "Audio Reference Clip",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.16.0",
+        "Node name for S&R": "LoadAudio"
+      },
+      "widgets_values": [
+        "bcoooper1.m4a",
+        null,
+        null
+      ]
+    },
+    {
+      "id": 5192,
+      "type": "VHS_LoadVideo",
+      "pos": [
+        -5514.0161503237005,
+        4008.9233980556082
+      ],
+      "size": [
+        259.43333435058594,
+        310
+      ],
+      "flags": {},
+      "order": 45,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "meta_batch",
+          "shape": 7,
+          "type": "VHS_BatchManager",
+          "link": null
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            14048,
+            14049,
+            14050
+          ]
+        },
+        {
+          "name": "frame_count",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": []
+        },
+        {
+          "name": "video_info",
+          "type": "VHS_VIDEOINFO",
+          "links": null
+        }
+      ],
+      "title": "starting video",
+      "properties": {
+        "cnr_id": "comfyui-videohelpersuite",
+        "ver": "993082e4f2473bf4acaf06f51e33877a7eb38960",
+        "Node name for S&R": "VHS_LoadVideo"
+      },
+      "widgets_values": {
+        "video": "",
+        "force_rate": 0,
+        "custom_width": 0,
+        "custom_height": 0,
+        "frame_load_cap": 9,
+        "skip_first_frames": 13,
+        "select_every_nth": 1,
+        "format": "AnimateDiff",
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {
+            "filename": "",
+            "type": "input",
+            "format": "video/mp4",
+            "force_rate": 0,
+            "custom_width": 0,
+            "custom_height": 0,
+            "frame_load_cap": 9,
+            "skip_first_frames": 13,
+            "select_every_nth": 1
+          }
+        }
+      }
+    },
+    {
+      "id": 5256,
+      "type": "LoRAOptimizerSimple",
+      "pos": [
+        -4458.333679846804,
+        3565.4912564843353
+      ],
+      "size": [
+        294.6000061035156,
+        162
+      ],
+      "flags": {},
+      "order": 66,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 14054
+        },
+        {
+          "name": "lora_stack",
+          "type": "LORA_STACK",
+          "link": 14053
+        },
+        {
+          "name": "clip",
+          "shape": 7,
+          "type": "CLIP",
+          "link": null
+        },
+        {
+          "name": "tuner_data",
+          "shape": 7,
+          "type": "TUNER_DATA",
+          "link": null
+        },
+        {
+          "name": "settings",
+          "shape": 7,
+          "type": "OPTIMIZER_SETTINGS",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "links": [
+            14055,
+            14056
+          ]
+        },
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "links": null
+        },
+        {
+          "name": "analysis_report",
+          "type": "STRING",
+          "links": null
+        },
+        {
+          "name": "tuner_data",
+          "type": "TUNER_DATA",
+          "links": null
+        },
+        {
+          "name": "lora_data",
+          "type": "LORA_DATA",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-lora-optimizer",
+        "ver": "5133fa3dd0976f682b9fef2a5fd7a454c5b7ef8f",
+        "Node name for S&R": "LoRAOptimizerSimple"
+      },
+      "widgets_values": [
+        1,
+        1
+      ]
+    },
+    {
+      "id": 5217,
+      "type": "LoRA Stacker",
+      "pos": [
+        -4578.56408054561,
+        3236.8134650693614
+      ],
+      "size": [
+        291.81541775093956,
+        130
+      ],
+      "flags": {},
+      "order": 46,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "lora_stack",
+          "shape": 7,
+          "type": "LORA_STACK",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LORA_STACK",
+          "type": "LORA_STACK",
+          "links": [
+            14053
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "efficiency-nodes-comfyui",
+        "ver": "f0971b5553ead8f6e66bb99564431e2590cd3981",
+        "Node name for S&R": "LoRA Stacker"
+      },
+      "widgets_values": [
+        "simple",
+        1,
+        "ltx2/sex/sfbehind_LTX2_3_v0_1.safetensors",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "ltx2/sex/prone_face_cam_v0_2.safetensors",
+        0.7,
+        1,
+        1,
+        "ltx2/anatomy/LTX-2 Tit-Daddy7500.safetensors",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
+        1,
+        1,
+        1,
+        "None",
         1,
         1,
         1
+      ],
+      "color": "#222233",
+      "bgcolor": "#333355",
+      "shape": "box"
+    },
+    {
+      "id": 5167,
+      "type": "IDLoRAGuider",
+      "pos": [
+        -1457.5524573131124,
+        3606.9413232578186
+      ],
+      "size": [
+        270,
+        186
+      ],
+      "flags": {},
+      "order": 85,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 13995
+        },
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 13965
+        },
+        {
+          "name": "negative_cond",
+          "type": "CONDITIONING",
+          "link": 13966
+        },
+        {
+          "name": "joint_latent",
+          "type": "LATENT",
+          "link": 13905
+        },
+        {
+          "name": "id_dropout_cond",
+          "shape": 7,
+          "type": "CONDITIONING",
+          "link": 13964
+        }
+      ],
+      "outputs": [
+        {
+          "name": "guider",
+          "type": "GUIDER",
+          "links": [
+            13852
+          ]
+        },
+        {
+          "name": "joint_latent",
+          "type": "LATENT",
+          "links": [
+            13851
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "pineambassador/ComfyUI-ID-Lora-Pine",
+        "ver": "51baaa30c4541356991aadc886eff9e4c225ed98",
+        "Node name for S&R": "IDLoRAGuider"
+      },
+      "widgets_values": [
+        2,
+        5,
+        7
+      ]
+    },
+    {
+      "id": 5199,
+      "type": "IDLoRAPrepareAudioReference",
+      "pos": [
+        -3025.785046397974,
+        3669.10754926195
+      ],
+      "size": [
+        306.0000061035156,
+        146
+      ],
+      "flags": {},
+      "order": 80,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 13953
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 14025
+        },
+        {
+          "name": "audio_vae",
+          "type": "VAE",
+          "link": 13955
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            13963
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "pineambassador/ComfyUI-ID-Lora-Pine",
+        "ver": "51baaa30c4541356991aadc886eff9e4c225ed98",
+        "Node name for S&R": "IDLoRAPrepareAudioReference"
+      },
+      "widgets_values": [
+        48000,
+        1.2
+      ]
+    },
+    {
+      "id": 5257,
+      "type": "IDLoRAPromptFormatter",
+      "pos": [
+        -6025.712227306917,
+        3182.622417225663
+      ],
+      "size": [
+        400,
+        402
+      ],
+      "flags": {},
+      "order": 47,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "positive_prompt",
+          "type": "STRING",
+          "links": [
+            14057
+          ]
+        },
+        {
+          "name": "negative_prompt",
+          "type": "STRING",
+          "links": [
+            14058
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "pineambassador/ComfyUI-ID-Lora-Pine",
+        "ver": "7db2d64a3cd4e13500d32b9d51476f1028f24060",
+        "Node name for S&R": "IDLoRAPromptFormatter"
+      },
+      "widgets_values": [
+        "[NAME]",
+        "a middle-aged man with a kind face",
+        "",
+        "nodding slowly while looking at the camera",
+        "I think we've finally found the solution.",
+        "soft rain",
+        "low quality, blurry..."
       ]
     }
   ],
@@ -4647,12 +5081,28 @@
       "LATENT_UPSCALE_MODEL"
     ],
     [
+      13822,
+      5036,
+      0,
+      5156,
+      0,
+      "IMAGE"
+    ],
+    [
       13823,
       5158,
       0,
       5157,
       1,
       "VAE"
+    ],
+    [
+      13825,
+      5157,
+      0,
+      5156,
+      1,
+      "AUDIO"
     ],
     [
       13837,
@@ -4851,30 +5301,6 @@
       5195,
       0,
       5030,
-      0,
-      "IMAGE"
-    ],
-    [
-      13950,
-      2004,
-      0,
-      5194,
-      0,
-      "IMAGE"
-    ],
-    [
-      13951,
-      2004,
-      0,
-      5195,
-      0,
-      "IMAGE"
-    ],
-    [
-      13952,
-      2004,
-      0,
-      5033,
       0,
       "IMAGE"
     ],
@@ -5095,6 +5521,14 @@
       "INT"
     ],
     [
+      14015,
+      5237,
+      0,
+      4999,
+      4,
+      "FLOAT"
+    ],
+    [
       14016,
       5028,
       0,
@@ -5175,6 +5609,14 @@
       "AUDIO"
     ],
     [
+      14032,
+      5221,
+      0,
+      5144,
+      0,
+      "MODEL"
+    ],
+    [
       14034,
       5226,
       0,
@@ -5183,71 +5625,63 @@
       "MODEL"
     ],
     [
-      14042,
-      5221,
+      14045,
+      5143,
       0,
-      5144,
+      5254,
       0,
-      "MODEL"
+      "*"
+    ],
+    [
+      14046,
+      4851,
+      0,
+      4999,
+      0,
+      "IMAGE"
+    ],
+    [
+      14047,
+      4848,
+      0,
+      4999,
+      1,
+      "AUDIO"
+    ],
+    [
+      14048,
+      5192,
+      0,
+      5033,
+      0,
+      "IMAGE"
+    ],
+    [
+      14049,
+      5192,
+      0,
+      5194,
+      0,
+      "IMAGE"
     ],
     [
       14050,
-      5253,
-      1,
-      2612,
-      1,
-      "STRING"
-    ],
-    [
-      14051,
-      5036,
+      5192,
       0,
-      5254,
+      5195,
       0,
       "IMAGE"
-    ],
-    [
-      14052,
-      5157,
-      0,
-      5254,
-      1,
-      "AUDIO"
     ],
     [
       14053,
-      5253,
+      5217,
       0,
-      2483,
+      5256,
       1,
-      "STRING"
+      "LORA_STACK"
     ],
     [
       14054,
-      4851,
-      0,
-      5255,
-      0,
-      "IMAGE"
-    ],
-    [
-      14055,
-      4848,
-      0,
-      5255,
-      1,
-      "AUDIO"
-    ],
-    [
-      14056,
-      5237,
-      0,
-      5255,
-      4,
-      "FLOAT"
-    ],
-    [
-      14059,
       5250,
       0,
       5256,
@@ -5255,7 +5689,15 @@
       "MODEL"
     ],
     [
-      14060,
+      14055,
+      5256,
+      0,
+      5221,
+      0,
+      "MODEL"
+    ],
+    [
+      14056,
       5256,
       0,
       5143,
@@ -5263,12 +5705,20 @@
       "MODEL"
     ],
     [
-      14061,
-      5256,
+      14057,
+      5257,
       0,
-      5221,
-      0,
-      "MODEL"
+      2483,
+      1,
+      "STRING"
+    ],
+    [
+      14058,
+      5257,
+      1,
+      2612,
+      1,
+      "STRING"
     ]
   ],
   "groups": [
@@ -5393,10 +5843,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.23579476910000097,
+      "scale": 0.2853116706110191,
       "offset": [
-        8355.864201759696,
-        -1764.5493638933667
+        5361.393403773174,
+        -2186.4149988346503
       ]
     },
     "frontendVersion": "1.39.19",
