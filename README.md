@@ -7,5 +7,3 @@ and
 https://github.com/ID-LoRA/ID-LoRA
 
 <img src="images/Nodes Screenshot from 2026-03-30 20-25-50.png" alt="Nodes">
-
-<img src="images/Worflow Screenshot from 2026-03-24 15-51-20.png" alt="Workflow">
