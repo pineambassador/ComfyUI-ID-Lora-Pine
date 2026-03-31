@@ -11,76 +11,99 @@ class IDLoRAPrepareAudioReference:
         return {
             "required": {
                 "conditioning": ("CONDITIONING",),
+                "dropout": ("CONDITIONING",),
                 "audio": ("AUDIO",),
                 "audio_vae": ("VAE",),
-                "target_sample_rate": ("INT", {"default": 24000, "min": 8000, "max": 96000, "step": 1000}),
-                "audio_strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 2.0, "step": 0.01}),
+                "audio_strength": ("FLOAT", {"default": 1.1, "min": 0.0, "max": 10.0, "step": 0.1}),
+                "timbre_boost": ("FLOAT", {"default": 1.2, "min": 1.0, "max": 4.0, "step": 0.05}),
+                "pitch_adjustment": ("FLOAT", {"default": 1.0, "min": 0.5, "max": 2.0, "step": 0.01}),
+                "audio_distance": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 5.0, "step": 0.1}),
             }
         }
 
-    RETURN_TYPES = ("CONDITIONING",)
-    RETURN_NAMES = ("positive",)
-    FUNCTION = "process_audio_reference"
-    CATEGORY = "ID-LoRA/Conditioning"
+    RETURN_TYPES = ("CONDITIONING", "CONDITIONING",)
+    RETURN_NAMES = ("conditioning", "dropout",)
+    FUNCTION = "process_dual_audio"
+    CATEGORY = "ID-LoRA/Audio"
 
-    def process_audio_reference(self, conditioning, audio, audio_vae, target_sample_rate, audio_strength):
+    def process_dual_audio(self, conditioning, dropout, audio, audio_vae, audio_strength, timbre_boost, pitch_adjustment, audio_distance):
+        TARGET_RATE = 24000 
+        
         try:
             waveform = audio["waveform"]
             sr = audio["sample_rate"]
-            
-            # 1. Ensure Waveform is [Batch, Channels, Samples]
-            # ComfyUI often provides [Batch, Samples, Channels]
-            if waveform.dim() == 3 and waveform.shape[2] < waveform.shape[1]:
-                waveform = waveform.transpose(1, 2)
-            elif waveform.dim() == 2:
-                waveform = waveform.unsqueeze(0) # Add batch dim if missing
 
-            # Force Mono
-            if waveform.shape[1] > 1:
-                waveform = torch.mean(waveform, dim=1, keepdim=True)
-                
-            # 2. Resample
-            if sr != target_sample_rate:
-                import torchaudio.transforms as T
-                resampler = T.Resample(sr, target_sample_rate).to(waveform.device)
-                waveform = resampler(waveform.to(torch.float32))
+            # Convert to Mono if necessary
+            if waveform.shape[0] > 1:
+                waveform = torch.mean(waveform, dim=0, keepdim=True)
 
-            # 3. VAE ENCODE
-            vae_input = {"waveform": waveform, "sample_rate": target_sample_rate}
+            # --- 1. PITCH SHIFT LOGIC ---
+            effective_sr = int(sr / pitch_adjustment)
+            import torchaudio.transforms as T
+            resampler = T.Resample(effective_sr, TARGET_RATE).to(waveform.device)
+            waveform = resampler(waveform.to(torch.float32))
+
+            # --- 2. VAE ENCODING ---
+            vae_input = {"waveform": waveform, "sample_rate": TARGET_RATE}
             latents_dict = audio_vae.encode(vae_input)
+            audio_samples = latents_dict.get("samples") if isinstance(latents_dict, dict) else latents_dict
+
+            # --- 3. SYMMETRY & NORMALIZATION ---
+            raw_std = torch.std(audio_samples).item()
+            raw_mean = torch.mean(audio_samples)
             
-            # Handle different VAE return types
-            if isinstance(latents_dict, dict):
-                audio_samples = latents_dict.get("samples", None)
-            else:
-                audio_samples = latents_dict
+            # Center the signal to 0
+            audio_samples = audio_samples - raw_mean
+            
+            # Force unit variance (Unity Gain)
+            if raw_std > 0:
+                audio_samples = audio_samples / raw_std
 
-            if audio_samples is None:
-                print("ERROR: Audio VAE returned None")
-                return (conditioning,)
+            # --- 4. TIMBRE & DISTANCE PERSPECTIVE ---
+            # Calculate distance roll-off for timbre
+            distance_factor = max(0.1, 1.0 - (audio_distance * 0.2))
+            current_timbre = max(1.0, timbre_boost * distance_factor)
+            audio_samples = audio_samples * current_timbre
+            
+            # Soft Clip to prevent 'Robotic' stuttering (The -4 to 4 safety zone)
+            audio_samples = torch.tanh(audio_samples / 4.0) * 4.0
+            
+            # Apply volume drop for distance
+            final_strength = audio_strength / (1.0 + audio_distance)
+            audio_samples = audio_samples * final_strength
 
-            # 4. LTX2.3 Adjustments
-            # Using 1.0 as base scaling for LTX2.3 Audio conditioning
-            audio_samples = audio_samples * audio_strength 
-
-            # Ensure 5D [B, C, T, 1, 1] for LTX transformer
+            # Prepare for injection (unsqueeze to 5D for LTX conditioning)
             while audio_samples.dim() < 5:
                 audio_samples = audio_samples.unsqueeze(-1)
 
-            # 5. CONDITIONING INJECTION
-            new_conditioning = []
-            for t in conditioning:
-                metadata = t[1].copy()
-                metadata["audio_latent"] = audio_samples.clone()
-                new_conditioning.append([t[0].clone(), metadata])
+            # DIAGNOSTICS
+            print(f"--- [DUAL-PATH AUDIO DIAGNOSTICS] ---")
+            print(f"Pitch: {pitch_adjustment}x | Timbre: {current_timbre:.2f}")
+            print(f"Final Std Dev: {torch.std(audio_samples).item():.4f}")
+            print(f"Latent Range: [{torch.min(audio_samples).item():.2f} to {torch.max(audio_samples).item():.2f}]")
 
-            print(f"DEBUG [AudioRef]: Success! Injected Shape: {audio_samples.shape}")
-            return (new_conditioning,)
+            # --- 5. INJECTION LOGIC (SYMMETRIC) ---
+            def apply_audio_to_cond(cond_list):
+                new_conditioning = []
+                for t in cond_list:
+                    metadata = t[1].copy()
+                    # Staple the processed audio to the metadata
+                    metadata["audio_latent"] = audio_samples.clone()
+                    # Ensure weight is consistent
+                    metadata["audio_weight"] = 1.0 
+                    new_conditioning.append([t[0].clone(), metadata])
+                return new_conditioning
+
+            # Inject the same exact latents into both branches
+            pos_out = apply_audio_to_cond(conditioning)
+            drop_out = apply_audio_to_cond(dropout)
+
+            return (pos_out, drop_out)
 
         except Exception as e:
-            print(f"ERROR in IDLoRAPrepareAudioReference: {str(e)}")
-            # Return original conditioning so the workflow doesn't hard-crash
-            return (conditioning,)
+            print(f"ERROR in IDLoRAPrepareAudioReference: {e}")
+            return (conditioning, dropout)
+
 
 # --- VIDEO PREPARATION (First Frame Injection) ---
 
@@ -151,12 +174,12 @@ class IDLoRAGuider:
                 "conditioning": ("CONDITIONING",),
                 "negative_cond": ("CONDITIONING",),
                 "joint_latent": ("LATENT",),
-                "cfg": ("FLOAT", {"default": 3.0, "min": 0.0, "max": 100.0, "step": 0.1, "label": "Global CFG"}),
-                "id_cfg": ("FLOAT", {"default": 3.0, "min": 0.0, "max": 100.0, "step": 0.1, "label": "Identity CFG"}),
+                "cfg": ("FLOAT", {"default": 2.0, "min": 0.0, "max": 100.0, "step": 0.1, "label": "Global CFG"}),
+                "id_cfg": ("FLOAT", {"default": 5.0, "min": 0.0, "max": 100.0, "step": 0.1, "label": "Identity CFG"}),
                 "audio_cfg": ("FLOAT", {"default": 7.0, "min": 0.0, "max": 100.0, "step": 0.1, "label": "Audio CFG"}),
             },
             "optional": {
-                "id_dropout_cond": ("CONDITIONING",), # Standard text-only conditioning
+                "id_dropout_cond": ("CONDITIONING",), 
             }
         }
 
@@ -167,18 +190,13 @@ class IDLoRAGuider:
 
     def setup(self, model, conditioning, negative_cond, joint_latent, cfg, id_cfg, audio_cfg, id_dropout_cond=None):
         processed_pos = []
-        
         for t in conditioning:
             m = t[1].copy()
-            # Inject the specialized weights for the ID-LoRA DiT layers
-            m["id_weight"] = id_cfg      # Identity/Speaker strength
-            m["audio_weight"] = audio_cfg # Environment/Audio sync strength
+            m["id_weight"] = id_cfg      
+            m["audio_weight"] = audio_cfg 
             
-            # DROPOUT LOGIC: 
-            # If a dropout condition (text-only) is provided, we attach it to the 
-            # metadata. The sampler uses this to calculate the 'Identity Delta'.
+            # The Sampler uses this text-only latent to calculate the 'Delta'
             if id_dropout_cond is not None:
-                # We take the first conditioning tensor from the dropout list
                 m["id_dropout_samples"] = id_dropout_cond[0][0]
             
             processed_pos.append([t[0].clone(), m])
@@ -186,7 +204,6 @@ class IDLoRAGuider:
         guider = comfy.samplers.CFGGuider(model)
         guider.set_conds(processed_pos, negative_cond)
         guider.set_cfg(cfg) 
-        
         return (guider, joint_latent)
 
 class IDLoRAPromptFormatter:
@@ -196,51 +213,55 @@ class IDLoRAPromptFormatter:
             "required": {
                 "id_tag": ("STRING", {"default": "[NAME]"}),
                 "primary_desc": ("STRING", {"multiline": True, "default": "a middle-aged man with a kind face"}),
-                "secondary_desc": ("STRING", {"multiline": True, "default": ""}), # Leave empty for 1 person
+                "secondary_desc": ("STRING", {"multiline": True, "default": ""}), 
                 "visual_action": ("STRING", {"multiline": True, "default": "nodding slowly while looking at the camera"}),
                 "dialogue_text": ("STRING", {"multiline": True, "default": "I think we've finally found the solution."}),
                 "environmental_sounds": ("STRING", {"multiline": True, "default": "soft rain"}),
                 "negative_prompt": ("STRING", {"multiline": True, "default": "low quality, blurry..."}),
             }
         }
-    RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("positive_prompt", "negative_prompt")
+    
+    # We now return three strings instead of two
+    RETURN_TYPES = ("STRING", "STRING", "STRING")
+    RETURN_NAMES = ("positive_prompt", "dropout_prompt", "negative_prompt")
     FUNCTION = "format_prompt"
     CATEGORY = "ID-LoRA/Prompting"
 
     def format_prompt(self, id_tag, primary_desc, secondary_desc, visual_action, dialogue_text, environmental_sounds, negative_prompt):
-        # 1. DYNAMIC VISUAL CONSTRUCTION
+        # 1. FULL CONDITIONED PROMPT (For the main 'conditioning' input)
         if secondary_desc.strip() and secondary_desc.lower() != "none":
-            # TWO PERSON MODE: Forces spatial separation to stop speech-hijacking
             visual_block = (
-                f"[VISUAL]: {id_tag} {primary_desc} on the left, "
-                f"and {secondary_desc} on the right. "
-                f"They are {visual_action}."
+                f" [VISUAL]: {id_tag} {primary_desc}, "
+                f"and {secondary_desc}. "
+                f"{visual_action}."
             )
         else:
-            # SINGLE PERSON MODE: Standard centered focus
-            visual_block = f"[VISUAL]: {id_tag} {primary_desc}, {visual_action}."
+            visual_block = f" [VISUAL]: {id_tag} {primary_desc}, {visual_action}\n"
 
-        # 2. DIALOGUE ATTRIBUTION
-        # If there are two people, the model needs to see the name 
-        # specifically inside the SPEECH tag to link the audio to the correct mouth.
-        speech_block = f"[SPEECH]: {dialogue_text}"
+        speech_block = f"[SPEECH]: {dialogue_text}\n"
+        sound_block = f"[SOUNDS]: {environmental_sounds}\n"
         
-        # 3. SOUNDS
-        sound_block = f"[SOUNDS]: {environmental_sounds}."
+        full_pos = f"{visual_block} {speech_block} {sound_block}"
 
-        pos = f"{visual_block} {speech_block} {sound_block}"
-        
-        return (pos, negative_prompt)
+        # 2. DROPOUT PROMPT (The "Clean" version for Delta calculation)
+        # We remove the [NAME] tag and the specific [SPEECH]/[SOUNDS] markers
+        # This gives the model a 'generic' baseline to compare against.
+        if secondary_desc.strip() and secondary_desc.lower() != "none":
+            dropout_pos = f"two people, {environmental_sounds}."
+        else:
+            dropout_pos = f"a person, {environmental_sounds}."
+
+        return (full_pos, dropout_pos, negative_prompt)
 
 class IDLoRAAudioNoiseInjector:
     @classmethod
     def INPUT_TYPES(s):
         return {
             "required": {
-                "samples": ("LATENT",), # Output from the official LTX Empty Audio Node
+                "samples": ("LATENT",),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
                 "strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "apply_scaling": ("BOOLEAN", {"default": False}),
             }
         }
 
@@ -248,23 +269,16 @@ class IDLoRAAudioNoiseInjector:
     FUNCTION = "inject_noise"
     CATEGORY = "ID-LoRA/Audio"
 
-    def inject_noise(self, samples, seed, strength):
+    def inject_noise(self, samples, seed, strength, apply_scaling):
         s = samples.copy()
-        audio_tensor = s["samples"]
+        audio_tensor = s["samples"].clone()
         
-        # 1. Scaling for LTX2.3 (The VAE Constant)
-        # This keeps the audio latents in the same numerical 'range' as the video
-        #scaling_factor = 0.18215
+        if apply_scaling:
+            audio_tensor = audio_tensor * 0.18215
         
         torch.manual_seed(seed)
         noise = torch.randn_like(audio_tensor)
-        
-        # 2. Blending
-        # Using strength 1.0 here means we are starting with 'Balanced LTX Noise'
         s["samples"] = (audio_tensor * (1.0 - strength)) + (noise * strength)
-        
-        # Optional: Print stats for the first frame to verify scaling
-        print(f"DEBUG [AudioNoise]: Std Dev: {torch.std(s['samples']).item():.4f}")
             
         return (s,)
 
