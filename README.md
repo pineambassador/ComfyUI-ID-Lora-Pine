@@ -6,4 +6,4 @@ See https://id-lora.github.io
 and
 https://github.com/ID-LoRA/ID-LoRA
 
-<img src="images/Nodes Screenshot from 2026-03-30 20-25-50.png" alt="Nodes">
+<img src="images/nodes Screenshot from 2026-04-05 18-27-14.png" alt="Nodes">
