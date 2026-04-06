@@ -1,8 +1,8 @@
 {
   "id": "394ed254-7306-42a2-9ae6-aa880ce4456d",
   "revision": 0,
-  "last_node_id": 5474,
-  "last_link_id": 14464,
+  "last_node_id": 5475,
+  "last_link_id": 14466,
   "nodes": [
     {
       "id": 4967,
@@ -265,7 +265,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 119,
+      "order": 120,
       "mode": 0,
       "inputs": [
         {
@@ -329,7 +329,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 120,
+      "order": 121,
       "mode": 0,
       "inputs": [
         {
@@ -376,7 +376,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 107,
+      "order": 108,
       "mode": 0,
       "inputs": [
         {
@@ -416,7 +416,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 117,
+      "order": 118,
       "mode": 0,
       "inputs": [
         {
@@ -705,7 +705,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 105,
+      "order": 106,
       "mode": 0,
       "inputs": [
         {
@@ -769,7 +769,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 121,
+      "order": 122,
       "mode": 0,
       "inputs": [
         {
@@ -808,7 +808,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 108,
+      "order": 109,
       "mode": 0,
       "inputs": [
         {
@@ -1201,7 +1201,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 114,
+      "order": 115,
       "mode": 0,
       "inputs": [
         {
@@ -1313,7 +1313,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 113,
+      "order": 114,
       "mode": 0,
       "inputs": [
         {
@@ -1589,7 +1589,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 123,
+      "order": 124,
       "mode": 0,
       "inputs": [
         {
@@ -1638,7 +1638,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 122,
+      "order": 123,
       "mode": 0,
       "inputs": [
         {
@@ -2007,7 +2007,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 109,
+      "order": 110,
       "mode": 0,
       "inputs": [
         {
@@ -2048,7 +2048,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 110,
+      "order": 111,
       "mode": 0,
       "inputs": [
         {
@@ -2835,7 +2835,7 @@
         "collapsed": true,
         "pinned": true
       },
-      "order": 101,
+      "order": 105,
       "mode": 0,
       "inputs": [
         {
@@ -2980,7 +2980,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 111,
+      "order": 112,
       "mode": 0,
       "inputs": [
         {
@@ -3729,7 +3729,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 95,
+      "order": 101,
       "mode": 0,
       "inputs": [
         {
@@ -4006,7 +4006,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            14443
+            14465
           ]
         },
         {
@@ -4183,7 +4183,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 112,
+      "order": 113,
       "mode": 0,
       "inputs": [
         {
@@ -4388,6 +4388,7 @@
         },
         {
           "name": "portraits",
+          "shape": 7,
           "type": "LATENT",
           "link": 14397
         }
@@ -4471,7 +4472,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 118,
+      "order": 119,
       "mode": 0,
       "inputs": [
         {
@@ -4585,7 +4586,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 116,
+      "order": 117,
       "mode": 0,
       "inputs": [
         {
@@ -4600,6 +4601,7 @@
         },
         {
           "name": "portraits",
+          "shape": 7,
           "type": "LATENT",
           "link": 14401
         }
@@ -4640,7 +4642,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 106,
+      "order": 107,
       "mode": 0,
       "inputs": [
         {
@@ -4912,7 +4914,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 115,
+      "order": 116,
       "mode": 0,
       "inputs": [
         {
@@ -4992,7 +4994,7 @@
       "flags": {
         "pinned": true
       },
-      "order": 124,
+      "order": 125,
       "mode": 0,
       "inputs": [
         {
@@ -5375,6 +5377,29 @@
       }
     },
     {
+      "id": 5474,
+      "type": "Note",
+      "pos": [
+        -216.81520571702526,
+        3024.820802744179
+      ],
+      "size": [
+        210,
+        101.95272644410761
+      ],
+      "flags": {},
+      "order": 59,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "euler and dpmpp_2m seem best for adding detail, but in some scenes dpmpp_2m seems to go too far, so making euler the defailt"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
       "id": 5453,
       "type": "VAEEncode",
       "pos": [
@@ -5386,13 +5411,13 @@
         46
       ],
       "flags": {},
-      "order": 85,
+      "order": 95,
       "mode": 0,
       "inputs": [
         {
           "name": "pixels",
           "type": "IMAGE",
-          "link": 14443
+          "link": 14466
         },
         {
           "name": "vae",
@@ -5418,27 +5443,43 @@
       "widgets_values": []
     },
     {
-      "id": 5474,
-      "type": "Note",
+      "id": 5475,
+      "type": "Frame Select",
       "pos": [
-        -216.81520571702526,
-        3024.820802744179
+        -4799.878350580284,
+        4179.169121188309
       ],
       "size": [
-        210,
-        101.95272644410761
+        270,
+        58
       ],
       "flags": {},
-      "order": 59,
+      "order": 85,
       "mode": 0,
-      "inputs": [],
-      "outputs": [],
-      "properties": {},
-      "widgets_values": [
-        "euler and dpmpp_2m seem best for adding detail, but in some scenes dpmpp_2m seems to go too far, so making euler the defailt"
+      "inputs": [
+        {
+          "name": "frames",
+          "type": "IMAGE",
+          "link": 14465
+        }
       ],
-      "color": "#432",
-      "bgcolor": "#653"
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            14466
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "RES4LYF",
+        "ver": "7750bf7800b6ad9d670308a09989fc0c04c40cec",
+        "Node name for S&R": "Frame Select"
+      },
+      "widgets_values": [
+        0
+      ]
     }
   ],
   "links": [
@@ -6363,14 +6404,6 @@
       "MODEL"
     ],
     [
-      14443,
-      5325,
-      4,
-      5453,
-      0,
-      "IMAGE"
-    ],
-    [
       14456,
       5142,
       0,
@@ -6431,6 +6464,22 @@
       5472,
       0,
       5322,
+      0,
+      "IMAGE"
+    ],
+    [
+      14465,
+      5325,
+      4,
+      5475,
+      0,
+      "IMAGE"
+    ],
+    [
+      14466,
+      5475,
+      0,
+      5453,
       0,
       "IMAGE"
     ]
@@ -6574,8 +6623,8 @@
         "version": 1,
         "state": {
           "lastGroupId": 159,
-          "lastNodeId": 5474,
-          "lastLinkId": 14464,
+          "lastNodeId": 5475,
+          "lastLinkId": 14466,
           "lastRerouteId": 2
         },
         "revision": 0,
@@ -7800,10 +7849,10 @@
     },
     "workflowRendererVersion": "LG",
     "ds": {
-      "scale": 0.5054470284994476,
+      "scale": 0.31384283767219595,
       "offset": [
-        5946.7043509409605,
-        -2485.9303562610476
+        6914.876520497393,
+        -1594.0103933297028
       ]
     }
   },
