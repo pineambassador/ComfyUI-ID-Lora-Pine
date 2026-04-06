@@ -2280,7 +2280,9 @@
         "ver": "1.2.5",
         "Node name for S&R": "ShowText|pysssss"
       },
-      "widgets_values": []
+      "widgets_values": [
+        ""
+      ]
     },
     {
       "id": 5251,
@@ -2346,7 +2348,9 @@
         "ver": "1.2.5",
         "Node name for S&R": "ShowText|pysssss"
       },
-      "widgets_values": []
+      "widgets_values": [
+        ""
+      ]
     },
     {
       "id": 5239,
@@ -3551,7 +3555,7 @@
         "Node name for S&R": "LoadImage"
       },
       "widgets_values": [
-        "00002-1238666570-_detail_, a b3ckyqu1ck woman wearing a blue dress holding up a card with a caption on it that reads capitalist.png",
+        "",
         "image"
       ]
     },
@@ -3926,7 +3930,7 @@
         "Node name for S&R": "LoadImage"
       },
       "widgets_values": [
-        "00002-1238666570-_detail_, a b3ckyqu1ck woman wearing a blue dress holding up a card with a caption on it that reads capitalist.png",
+        "",
         "image"
       ]
     },
@@ -5243,13 +5247,7 @@
         "Node name for S&R": "IDLoRAPromptFormatter"
       },
       "widgets_values": [
-        "",
-        "a middle-aged man with a kind face",
-        "",
-        "nodding slowly while looking at the camera",
-        "I think we've finally found the solution.",
-        "soft rain",
-        "low quality, blurry..."
+        ""
       ]
     },
     {
@@ -5288,7 +5286,7 @@
         "Node name for S&R": "LoadImage"
       },
       "widgets_values": [
-        "00002-1238666570-_detail_, a b3ckyqu1ck woman wearing a blue dress holding up a card with a caption on it that reads capitalist.png",
+        "",
         "image"
       ]
     },
