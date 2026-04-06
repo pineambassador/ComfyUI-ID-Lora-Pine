@@ -6,4 +6,6 @@ See https://id-lora.github.io
 and
 https://github.com/ID-LoRA/ID-LoRA
 
+[release notes](release_notes.html)
 <img src="images/nodes Screenshot from 2026-04-05 18-27-14.png" alt="Nodes">
+
