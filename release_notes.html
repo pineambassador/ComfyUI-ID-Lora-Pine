@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 7.3.7.2 (Linux)"/>
+	<meta name="created" content="2026-04-05T18:32:00"/>
+	<meta name="changed" content="2026-04-05T18:35:00"/>
+	<style type="text/css">
+		@page { size: 8.5in 11in; margin: 0.79in }
+		p { color: #000000; line-height: 115%; text-align: left; orphans: 2; widows: 2; margin-bottom: 0.1in; direction: ltr; background: transparent }
+		p.western { font-family: "Liberation Serif", serif; font-size: 12pt; so-language: en-US }
+		p.cjk { font-family: "Noto Serif CJK SC"; font-size: 12pt; so-language: zh-CN }
+		p.ctl { font-family: "Lohit Devanagari"; font-size: 12pt; so-language: hi-IN }
+		h2 { color: #000000; text-align: left; orphans: 2; widows: 2; margin-top: 0.14in; margin-bottom: 0.08in; direction: ltr; background: transparent; page-break-after: avoid }
+		h2.western { font-family: "Liberation Sans", sans-serif; font-size: 18pt; so-language: en-US; font-weight: bold }
+		h2.cjk { font-family: "Noto Sans CJK SC"; font-size: 18pt; so-language: zh-CN; font-weight: bold }
+		h2.ctl { font-family: "Lohit Devanagari"; font-size: 18pt; so-language: hi-IN; font-weight: bold }
+		h3 { color: #000000; text-align: left; orphans: 2; widows: 2; margin-top: 0.1in; margin-bottom: 0.08in; direction: ltr; background: transparent; page-break-after: avoid }
+		h3.western { font-family: "Liberation Sans", sans-serif; font-size: 14pt; so-language: en-US; font-weight: bold }
+		h3.cjk { font-family: "Noto Sans CJK SC"; font-size: 14pt; so-language: zh-CN; font-weight: bold }
+		h3.ctl { font-family: "Lohit Devanagari"; font-size: 14pt; so-language: hi-IN; font-weight: bold }
+		h4 { color: #000000; text-align: left; orphans: 2; widows: 2; margin-top: 0.08in; margin-bottom: 0.08in; direction: ltr; background: transparent; page-break-after: avoid }
+		h4.western { font-family: "Liberation Sans", sans-serif; font-size: 14pt; so-language: en-US; font-weight: bold }
+		h4.cjk { font-family: "Noto Sans CJK SC"; font-size: 14pt; so-language: zh-CN; font-weight: bold }
+		h4.ctl { font-family: "Lohit Devanagari"; font-size: 14pt; so-language: hi-IN; font-weight: bold }
+		td p { color: #000000; text-align: left; orphans: 0; widows: 0; direction: ltr; background: transparent }
+		td p.western { font-family: "Liberation Serif", serif; font-size: 12pt; so-language: en-US }
+		td p.cjk { font-family: "Noto Serif CJK SC"; font-size: 12pt; so-language: zh-CN }
+		td p.ctl { font-family: "Lohit Devanagari"; font-size: 12pt; so-language: hi-IN }
+		code.western { font-family: "Liberation Mono", serif }
+		code.cjk { font-family: "Noto Sans Mono CJK SC" }
+		code.ctl { font-family: "Liberation Mono" }
+		strong { font-weight: bold }
+	</style>
+</head>
+<body lang="en-US" text="#000000" link="#000080" vlink="#800000" dir="ltr"><h2 class="western">
+<font face="Google Sans, serif">Release Notes: ID-LoRA Video v0.3
+(Temporal Identity Update)</font></h2>
+<h3 class="western" style="line-height: 112%; margin-top: 0in"><font face="Google Sans Text, serif">Executive
+Summary</font></h3>
+<p class="western" style="line-height: 112%"><font face="Google Sans Text, serif">This
+update introduces the </font><font face="Google Sans Text, serif"><b>&quot;Identity-First&quot;
+(0.70 Pitch)</b></font><font face="Google Sans Text, serif">
+workflow, focusing on high-fidelity likeness retention through
+long-form video generations. By moving away from static frame-seeding
+and toward a </font><font face="Google Sans Text, serif"><b>Latent
+Vacuum</b></font><font face="Google Sans Text, serif"> and </font><font face="Google Sans Text, serif"><b>Temporal
+Fading</b></font><font face="Google Sans Text, serif"> architecture,
+this version eliminates first-frame freezing and reduces identity
+drift during complex motion (e.g., profile turns).</font></p>
+<hr size="3"/>
+
+<h3 class="western" style="line-height: 112%; margin-top: 0in"><font face="Google Sans Text, serif">New
+Core Features</font></h3>
+<h4 class="western" style="line-height: 112%; margin-top: 0in"><font face="Google Sans Text, serif">1.
+The &quot;Soft Anchor&quot; Seeding System</font></h4>
+<ul>
+	<li><p class="western" style="line-height: 112%"><font face="Google Sans Text, serif"><b>Variable
+	Noise Masking:</b></font><font face="Google Sans Text, serif"> The
+	</font><code class="western">strength</code><font face="Google Sans Text, serif">
+	slider now directly controls the Noise Mask for Frame 0. Setting
+	strength to </font><font face="Google Sans Text, serif"><b>0.90</b></font><font face="Google Sans Text, serif">
+	allows </font><font face="Google Sans Text, serif"><b>10%</b></font><font face="Google Sans Text, serif">
+	noise permission, enabling the motion module to begin animating on
+	the very first frame while maintaining </font><font face="Google Sans Text, serif"><b>90%</b></font><font face="Google Sans Text, serif">
+	structural adherence.</font></p>
+	<li><p class="western" style="line-height: 112%"><font face="Google Sans Text, serif"><b>VAE
+	Scaling Handshake:</b></font><font face="Google Sans Text, serif">
+	Automatic detection and correction of LTX2.3 latent distributions
+	(using the </font><code class="western">0.18215</code><font face="Google Sans Text, serif">
+	scaling factor) to prevent the sampler from &quot;clobbering&quot;
+	injected frames.</font></p>
+</ul>
+<h4 class="western" style="line-height: 112%; margin-top: 0in"><font face="Google Sans Text, serif">2.
+Multi-Stage Identity Interleaving</font></h4>
+<ul>
+	<li><p class="western" style="line-height: 112%"><font face="Google Sans Text, serif"><b>Interleaved
+	Scene Anchors:</b></font><font face="Google Sans Text, serif">
+	Support for reinforcing the environment/scene at specific intervals
+	(e.g., frames </font><font face="Google Sans Text, serif"><b>12, 48,
+	96</b></font><font face="Google Sans Text, serif">) without
+	hard-locking the motion.</font></p>
+	<li><p class="western" style="line-height: 112%"><font face="Google Sans Text, serif"><b>Portrait
+	Handover Logic:</b></font><font face="Google Sans Text, serif"> New
+	support for multiple identity anchors (e.g., </font><font face="Google Sans Text, serif"><b>Frontal
+	@ Frame 24</b></font><font face="Google Sans Text, serif"> and
+	</font><font face="Google Sans Text, serif"><b>Profile @ Frame 60</b></font><font face="Google Sans Text, serif">)
+	with a customizable </font><font face="Google Sans Text, serif"><b>Linear
+	Fade</b></font><font face="Google Sans Text, serif">. This creates a
+	&quot;Latent Gradient&quot; that guides the model through head turns
+	without &quot;identity popping.&quot;</font></p>
+</ul>
+<h4 class="western" style="line-height: 112%; margin-top: 0in"><font face="Google Sans Text, serif">3.
+Refiner Stage Optimization (The &quot;Correction&quot; Pass)</font></h4>
+<ul>
+	<li><p class="western" style="line-height: 112%"><font face="Google Sans Text, serif"><b>Likeness-Priority
+	Routing:</b></font><font face="Google Sans Text, serif"> Added a
+	</font><font face="Google Sans Text, serif"><b>Refiner Mode</b></font><font face="Google Sans Text, serif">
+	that prioritizes Portrait Injection over Base-pass artifacts.</font></p>
+	<li><p class="western" style="line-height: 112%"><font face="Google Sans Text, serif"><b>Optimized
+	Sampler Stack:</b></font><font face="Google Sans Text, serif">
+	Recommendation of </font><font face="Google Sans Text, serif"><b>DPMPP_2M</b></font><font face="Google Sans Text, serif">
+	with </font><font face="Google Sans Text, serif"><b>sgm_uniform</b></font><font face="Google Sans Text, serif">
+	for the Refiner pass, providing high-precision sharpening and stable
+	likeness at low denoise (</font><font face="Google Sans Text, serif"><b>0.20</b></font><font face="Google Sans Text, serif">).</font></p>
+	<li><p class="western" style="line-height: 112%"><font face="Google Sans Text, serif"><b>Granular
+	CFG Balancing:</b></font><font face="Google Sans Text, serif">
+	Decoupled </font><font face="Google Sans Text, serif"><b>Global</b></font><font face="Google Sans Text, serif">,
+	</font><font face="Google Sans Text, serif"><b>Portrait</b></font><font face="Google Sans Text, serif">,
+	and </font><font face="Google Sans Text, serif"><b>Audio CFG</b></font><font face="Google Sans Text, serif">
+	to allow &quot;Quiet&quot; global guidance (</font><font face="Google Sans Text, serif"><b>1.8-2.0</b></font><font face="Google Sans Text, serif">)
+	while maintaining &quot;Loud&quot; Identity guidance (</font><font face="Google Sans Text, serif"><b>4.0+</b></font><font face="Google Sans Text, serif">)
+	for facial correction.</font></p>
+</ul>
+<h4 class="western" style="line-height: 112%; margin-top: 0in"><font face="Google Sans Text, serif">4.
+Authentic Acoustic Simulation</font></h4>
+<ul>
+	<li><p class="western" style="line-height: 112%"><font face="Google Sans Text, serif"><b>Environmental
+	Audio Sync:</b></font><font face="Google Sans Text, serif"> Support
+	for &quot;Smartphone&quot; and &quot;Field Recording&quot; acoustic
+	prompting, moving away from &quot;Studio-Dry&quot; audio toward
+	authentic, reverberant room-tones that maintain lip-sync through
+	heavy echo.</font></p>
+</ul>
+<hr size="3"/>
+
+<h3 class="western" style="line-height: 112%; margin-top: 0in"><font face="Google Sans Text, serif">Technical
+Breakdown: IDLoRAPrepareVideo Node</font></h3>
+<ul>
+	<li><p class="western" style="line-height: 112%"><font face="Google Sans Text, serif"><b>Input
+	</b></font><code class="western"><b>strength</b></code><font face="Google Sans Text, serif"><b>:</b></font><font face="Google Sans Text, serif">
+	Links directly to </font><code class="western">noise_mask</code><font face="Google Sans Text, serif">
+	($1 - strength$) for Frame 0.</font></p>
+	<li><p class="western" style="line-height: 112%"><font face="Google Sans Text, serif"><b>Input
+	</b></font><code class="western"><b>fade_frames</b></code><font face="Google Sans Text, serif"><b>:</b></font><font face="Google Sans Text, serif">
+	Controls the temporal blend length of portrait injections.</font></p>
+	<li><p class="western" style="line-height: 112%"><font face="Google Sans Text, serif"><b>Output:</b></font><font face="Google Sans Text, serif">
+	Returns a synchronized </font><code class="western">LATENT</code><font face="Google Sans Text, serif">
+	and </font><code class="western">NOISE_MASK</code><font face="Google Sans Text, serif">
+	pair compatible with advanced LTX schedulers.</font></p>
+</ul>
+<hr size="3"/>
+
+<h3 class="western" style="line-height: 112%; margin-top: 0in"><font face="Google Sans Text, serif">Recommended
+&quot;Sweet Spot&quot; Settings</font></h3>
+<table width="533" cellpadding="2" cellspacing="0">
+	<col width="68"/>
+
+	<col width="105"/>
+
+	<col width="76"/>
+
+	<col width="102"/>
+
+	<col width="161"/>
+
+	<tr>
+		<td width="68" style="border: 1px solid #000000; padding: 0.02in"><p class="western" style="orphans: 0; widows: 0">
+			<strong><font face="Google Sans Text, serif"><b>Pass</b></font></strong></p>
+		</td>
+		<td width="105" style="border: 1px solid #000000; padding: 0.02in"><p class="western" style="orphans: 0; widows: 0">
+			<strong><font face="Google Sans Text, serif"><b>Sampler</b></font></strong></p>
+		</td>
+		<td width="76" style="border: 1px solid #000000; padding: 0.02in"><p class="western" style="orphans: 0; widows: 0">
+			<strong><font face="Google Sans Text, serif"><b>Denoise</b></font></strong></p>
+		</td>
+		<td width="102" style="border: 1px solid #000000; padding: 0.02in"><p class="western" style="orphans: 0; widows: 0">
+			<strong><font face="Google Sans Text, serif"><b>Global CFG</b></font></strong></p>
+		</td>
+		<td width="161" style="border: 1px solid #000000; padding: 0.02in"><p class="western" style="orphans: 0; widows: 0">
+			<strong><font face="Google Sans Text, serif"><b>Portrait Strength</b></font></strong></p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr>
+		<td width="68" style="border: 1px solid #000000; padding: 0.02in"><p class="western" style="orphans: 0; widows: 0">
+			<font face="Google Sans Text, serif"><b>Base</b></font></p>
+		</td>
+		<td width="105" style="border: 1px solid #000000; padding: 0.02in"><p class="western" style="orphans: 0; widows: 0">
+			<font face="Google Sans Text, serif">Euler/DPMPP</font></p>
+		</td>
+		<td width="76" style="border: 1px solid #000000; padding: 0.02in"><p class="western" style="orphans: 0; widows: 0">
+			<font face="Google Sans Text, serif">0.90</font></p>
+		</td>
+		<td width="102" style="border: 1px solid #000000; padding: 0.02in"><p class="western" style="orphans: 0; widows: 0">
+			<font face="Google Sans Text, serif">4.0</font></p>
+		</td>
+		<td width="161" style="border: 1px solid #000000; padding: 0.02in"><p class="western" style="orphans: 0; widows: 0">
+			<font face="Google Sans Text, serif">0.45 (Fade: 12)</font></p>
+		</td>
+	</tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr></tr>
+	<tr>
+		<td width="68" style="border: 1px solid #000000; padding: 0.02in"><p class="western" style="orphans: 0; widows: 0">
+			<font face="Google Sans Text, serif"><b>Refiner</b></font></p>
+		</td>
+		<td width="105" style="border: 1px solid #000000; padding: 0.02in"><p class="western" style="orphans: 0; widows: 0">
+			<font face="Google Sans Text, serif"><b>DPMPP_2M</b></font></p>
+		</td>
+		<td width="76" style="border: 1px solid #000000; padding: 0.02in"><p class="western" style="orphans: 0; widows: 0">
+			<font face="Google Sans Text, serif"><b>0.20</b></font></p>
+		</td>
+		<td width="102" style="border: 1px solid #000000; padding: 0.02in"><p class="western" style="orphans: 0; widows: 0">
+			<font face="Google Sans Text, serif"><b>2.0</b></font></p>
+		</td>
+		<td width="161" style="border: 1px solid #000000; padding: 0.02in"><p class="western" style="orphans: 0; widows: 0">
+			<font face="Google Sans Text, serif"><b>0.30 (Fade: 8)</b></font></p>
+		</td>
+	</tr>
+</table>
+<p class="western" style="line-height: 100%; orphans: 0; widows: 0; margin-bottom: 0in">
+<br/>
+
+</p>
+</body>
+</html>
