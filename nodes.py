@@ -107,6 +107,7 @@ class IDLoRAPrepareAudioReference:
 
 # --- VIDEO PREPARATION (First Frame Injection) ---
 
+
 class IDLoRAPrepareVideo:
     @classmethod
     def INPUT_TYPES(s):
@@ -114,7 +115,11 @@ class IDLoRAPrepareVideo:
             "required": {
                 "latent_video": ("LATENT",),
                 "first_frame_ref": ("LATENT",),
+                "portraits": ("LATENT",),
                 "strength": ("FLOAT", {"default": 0.92, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "portrait_strength": ("FLOAT", {"default": 0.45, "min": 0.0, "max": 1.0, "step": 0.01}),
+                "frame_positions": ("STRING", {"default": "1, 48"}),
+                "fade_frames": ("INT", {"default": 10, "min": 1, "max": 50}),
                 "mode": (["Base", "Refiner"], {"default": "Base"}),
             }
         }
@@ -123,45 +128,72 @@ class IDLoRAPrepareVideo:
     FUNCTION = "prepare"
     CATEGORY = "ID-LoRA/Video"
 
-    def prepare(self, latent_video, first_frame_ref, strength, mode):
+    def prepare(self, latent_video, first_frame_ref, portraits, strength, portrait_strength, frame_positions, fade_frames, mode):
         v = latent_video["samples"].clone()
         ref = first_frame_ref["samples"].clone()
-        
-        # 1. Standard LTX2.3 VAE Scaling Correction
-        # This is the "Big Fish" for clarity. 
-        # LTX expects latents in a specific distribution.
-        if torch.std(ref).item() < 0.5:
-            ref = ref / 0.18215
-
+        pts = portraits["samples"].clone()
         B, C, F, H, W = v.shape
-        f_ref_count = ref.shape[2] if ref.dim() == 5 else 1
-        
-        # 2. KEYFRAME INJECTION (Mode: Base Only)
-        # In Refiner mode, we skip injection because we want to refine the 
-        # existing video, not overwrite it with a static frame.
+
+        # 1. SCALING CORRECTION
+        if torch.std(ref).item() < 0.5: ref = ref / 0.18215
+        if torch.std(pts).item() < 0.5: pts = pts / 0.18215
+
         mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
         
-        if mode == "Base":
-            for i in range(f_ref_count):
-                if i < F:
-                    current_f = ref[:, :, i, :, :] if ref.dim() == 5 else ref.squeeze(2)
-                    
-                    # Ensure spatial matching
-                    if v.shape[-2:] != current_f.shape[-2:]:
-                        current_f = torch.nn.functional.interpolate(
-                            current_f, size=v.shape[-2:], mode="bilinear"
-                        )
-                    
-                    # Inject at the slider strength (e.g., 0.92)
-                    v[:, :, i, :, :] = (current_f * strength) + (v[:, :, i, :, :] * (1.0 - strength))
-                    
-                    # Hard-lock Frame 0 only. 
-                    # We leave frames 1-F to be handled by the Scheduler's noise.
-                    mask[:, :, i, :, :] = 0.0 
+        # Define how many reference frames we have to interleave
+        f_ref_count = ref.shape[2] if ref.dim() == 5 else 1
 
-        # 3. OUTPUT
-        # For Refiner mode, v remains the original upscaled latent and mask is all 1s.
+        if mode == "Base":
+            # --- SCENE ANCHOR (Frame 0) ---
+            # Extract first frame and ensure it matches spatial dimensions
+            current_f = ref[:, :, 0, :, :] if ref.dim() == 5 else ref
+            if current_f.dim() == 4 and current_f.shape[0] > B: # Handle batch mismatch
+                current_f = current_f[0:B]
+            
+            if current_f.shape[-2:] != (H, W):
+                current_f = torch.nn.functional.interpolate(current_f, size=(H, W), mode="bilinear")
+            
+            # Inject pixels and set Soft Mask for Frame 0
+            v[:, :, 0, :, :] = (current_f * strength) + (v[:, :, 0, :, :] * (1.0 - strength))
+            mask[:, :, 0, :, :] = 1.0 - strength 
+
+            # --- INTERLEAVED ANCHORS (The rest of the reference frames) ---
+            for i in range(1, f_ref_count):
+                if i < F:
+                    # Extract the i-th frame from reference
+                    frame_to_inject = ref[:, :, i, :, :] if ref.dim() == 5 else current_f
+                    if frame_to_inject.shape[-2:] != (H, W):
+                        frame_to_inject = torch.nn.functional.interpolate(frame_to_inject, size=(H, W), mode="bilinear")
+                    
+                    v[:, :, i, :, :] = (frame_to_inject * strength) + (v[:, :, i, :, :] * (1.0 - strength))
+                    mask[:, :, i, :, :] = 1.0 - strength 
+
+            # --- PORTRAITS WITH FADE ---
+            try:
+                pos_list = [int(x.strip()) for x in frame_positions.split(",")]
+            except:
+                pos_list = [1, 48]
+
+            num_pts = pts.shape[0]
+            for i in range(num_pts):
+                target_f = pos_list[i] if i < len(pos_list) else pos_list[-1] + (i * 10)
+                
+                # Squeeze out temporal dim if present in portrait batch
+                p_img = pts[i:i+1].squeeze(2) if pts.dim() == 5 else pts[i:i+1]
+                if p_img.shape[-2:] != (H, W):
+                    p_img = torch.nn.functional.interpolate(p_img, size=(H, W), mode="bilinear")
+
+                for f_offset in range(fade_frames):
+                    current_idx = target_f + f_offset
+                    if current_idx >= F: break
+                    
+                    fade_factor = 1.0 - (f_offset / fade_frames)
+                    current_p_strength = portrait_strength * fade_factor
+                    
+                    v[:, :, current_idx, :, :] = (p_img * current_p_strength) + (v[:, :, current_idx, :, :] * (1.0 - current_p_strength))
+
         return ({"samples": v, "noise_mask": mask, "type": "video"},)
+
 
 # --- ID-LORA CONDITIONING & GUIDER ---
 
