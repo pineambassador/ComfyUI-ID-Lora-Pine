@@ -140,32 +140,27 @@ class IDLoRAPrepareVideo:
 
         mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
         
-        # Define how many reference frames we have to interleave
+        # 2. DETECT INPUT TYPE (Image vs. Video Seed)
         f_ref_count = ref.shape[2] if ref.dim() == 5 else 1
 
         if mode == "Base":
-            # --- SCENE ANCHOR (Frame 0) ---
-            # Extract first frame and ensure it matches spatial dimensions
-            current_f = ref[:, :, 0, :, :] if ref.dim() == 5 else ref
-            if current_f.dim() == 4 and current_f.shape[0] > B: # Handle batch mismatch
-                current_f = current_f[0:B]
-            
-            if current_f.shape[-2:] != (H, W):
-                current_f = torch.nn.functional.interpolate(current_f, size=(H, W), mode="bilinear")
-            
-            # Inject pixels and set Soft Mask for Frame 0
-            v[:, :, 0, :, :] = (current_f * strength) + (v[:, :, 0, :, :] * (1.0 - strength))
-            mask[:, :, 0, :, :] = 1.0 - strength 
-
-            # --- INTERLEAVED ANCHORS (The rest of the reference frames) ---
-            for i in range(1, f_ref_count):
+            # --- VIDEO/IMAGE ANCHORING ---
+            # If f_ref_count > 1, we treat the input as a motion seed (clip)
+            # If f_ref_count == 1, we treat it as a single-frame anchor
+            for i in range(f_ref_count):
                 if i < F:
-                    # Extract the i-th frame from reference
-                    frame_to_inject = ref[:, :, i, :, :] if ref.dim() == 5 else current_f
-                    if frame_to_inject.shape[-2:] != (H, W):
-                        frame_to_inject = torch.nn.functional.interpolate(frame_to_inject, size=(H, W), mode="bilinear")
+                    # Extract the specific frame from the reference
+                    current_f = ref[:, :, i, :, :] if ref.dim() == 5 else ref
                     
-                    v[:, :, i, :, :] = (frame_to_inject * strength) + (v[:, :, i, :, :] * (1.0 - strength))
+                    # Handle batch mismatches and spatial scaling
+                    if current_f.dim() == 4 and current_f.shape[0] > B:
+                        current_f = current_f[0:B]
+                    
+                    if current_f.shape[-2:] != (H, W):
+                        current_f = torch.nn.functional.interpolate(current_f, size=(H, W), mode="bilinear")
+                    
+                    # Inject pixels and set soft mask for the duration of the seed
+                    v[:, :, i, :, :] = (current_f * strength) + (v[:, :, i, :, :] * (1.0 - strength))
                     mask[:, :, i, :, :] = 1.0 - strength 
 
             # --- PORTRAITS WITH FADE ---
@@ -190,6 +185,7 @@ class IDLoRAPrepareVideo:
                     fade_factor = 1.0 - (f_offset / fade_frames)
                     current_p_strength = portrait_strength * fade_factor
                     
+                    # Note: We don't mask portraits; we let the sampler knit them in
                     v[:, :, current_idx, :, :] = (p_img * current_p_strength) + (v[:, :, current_idx, :, :] * (1.0 - current_p_strength))
 
         return ({"samples": v, "noise_mask": mask, "type": "video"},)
