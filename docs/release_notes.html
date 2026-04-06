@@ -5,7 +5,7 @@
 	<title></title>
 	<meta name="generator" content="LibreOffice 7.3.7.2 (Linux)"/>
 	<meta name="created" content="2026-04-05T18:32:00"/>
-	<meta name="changed" content="2026-04-05T18:35:00"/>
+	<meta name="changed" content="2026-04-05T19:20:34.979874052"/>
 	<style type="text/css">
 		@page { size: 8.5in 11in; margin: 0.79in }
 		p { color: #000000; line-height: 115%; text-align: left; orphans: 2; widows: 2; margin-bottom: 0.1in; direction: ltr; background: transparent }
@@ -32,6 +32,8 @@
 		code.cjk { font-family: "Noto Sans Mono CJK SC" }
 		code.ctl { font-family: "Liberation Mono" }
 		strong { font-weight: bold }
+		a:link { color: #000080; text-decoration: underline }
+		a:visited { color: #800000; text-decoration: underline }
 	</style>
 </head>
 <body lang="en-US" text="#000000" link="#000080" vlink="#800000" dir="ltr"><h2 class="western">
@@ -41,10 +43,9 @@
 Summary</font></h3>
 <p class="western" style="line-height: 112%"><font face="Google Sans Text, serif">This
 update introduces the </font><font face="Google Sans Text, serif"><b>&quot;Identity-First&quot;
-(0.70 Pitch)</b></font><font face="Google Sans Text, serif">
-workflow, focusing on high-fidelity likeness retention through
-long-form video generations. By moving away from static frame-seeding
-and toward a </font><font face="Google Sans Text, serif"><b>Latent
+</b></font><font face="Google Sans Text, serif">workflow, focusing on
+high-fidelity likeness retention through long-form video generations.
+By moving away from static frame-seeding and toward a </font><font face="Google Sans Text, serif"><b>Latent
 Vacuum</b></font><font face="Google Sans Text, serif"> and </font><font face="Google Sans Text, serif"><b>Temporal
 Fading</b></font><font face="Google Sans Text, serif"> architecture,
 this version eliminates first-frame freezing and reduces identity
@@ -113,18 +114,6 @@ Refiner Stage Optimization (The &quot;Correction&quot; Pass)</font></h4>
 	while maintaining &quot;Loud&quot; Identity guidance (</font><font face="Google Sans Text, serif"><b>4.0+</b></font><font face="Google Sans Text, serif">)
 	for facial correction.</font></p>
 </ul>
-<h4 class="western" style="line-height: 112%; margin-top: 0in"><font face="Google Sans Text, serif">4.
-Authentic Acoustic Simulation</font></h4>
-<ul>
-	<li><p class="western" style="line-height: 112%"><font face="Google Sans Text, serif"><b>Environmental
-	Audio Sync:</b></font><font face="Google Sans Text, serif"> Support
-	for &quot;Smartphone&quot; and &quot;Field Recording&quot; acoustic
-	prompting, moving away from &quot;Studio-Dry&quot; audio toward
-	authentic, reverberant room-tones that maintain lip-sync through
-	heavy echo.</font></p>
-</ul>
-<hr size="3"/>
-
 <h3 class="western" style="line-height: 112%; margin-top: 0in"><font face="Google Sans Text, serif">Technical
 Breakdown: IDLoRAPrepareVideo Node</font></h3>
 <ul>
