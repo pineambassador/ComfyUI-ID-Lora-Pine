@@ -9,7 +9,8 @@ https://github.com/ID-LoRA/ID-LoRA
 [release notes](https://pineambassador.github.io/ComfyUI-ID-Lora-Pine/release_notes.html)
 
 I recognize these nodes are starting to get complex settings-wise.  
-I've added some notes to the workflow, but it's a work in progress.
-I'll try to start populating the wiki soon.
+I've added some notes to the workflow.
+
+<s>I'll try to start populating the wiki soon.</s> The wiki is now started! (WIP of course)
 <img src="images/nodes Screenshot from 2026-04-05 18-27-14.png" alt="Nodes">
 
