@@ -14,3 +14,8 @@ I've added some notes to the workflow.
 <s>I'll try to start populating the wiki soon.</s> The wiki is now started! (WIP of course)
 <img src="images/nodes Screenshot from 2026-04-05 18-27-14.png" alt="Nodes">
 
+What's next?
+
+I'm exploring an approach to train an additional lora (akin to Stable-Video-Infinity) to see if it improves the result.  
+
+Vaporware disclaimer.
