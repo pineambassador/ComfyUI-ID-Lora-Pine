@@ -137,9 +137,11 @@ class IDLoRAPrepareVideo:
         # 1. SCALING CORRECTION (Reference)
         if torch.std(ref).item() < 0.5: ref = ref / 0.18215
 
-        # Initialize mask as all ones (Standard noise behavior)
-        mask = torch.ones((B, 1, F, H, W), device=v.device, dtype=v.dtype)
-        
+        # Initialize mask
+        # If Base: Start with noise (1.0)
+        # If Refiner: Start with a shield based on the strength slider
+        m_val = 1.0 if mode == "Base" else (1.0 - strength)
+        mask = torch.full((B, 1, F, H, W), m_val, device=v.device, dtype=v.dtype)        
         # 2. DETECT INPUT TYPE (Image vs. Video Seed)
         f_ref_count = ref.shape[2] if ref.dim() == 5 else 1
 
