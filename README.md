@@ -6,6 +6,7 @@ See https://id-lora.github.io
 and
 https://github.com/ID-LoRA/ID-LoRA
 
+0.3a coming - new workflows and a critical bug fix  
 [release notes](https://pineambassador.github.io/ComfyUI-ID-Lora-Pine/release_notes.html)
 
 I recognize these nodes are starting to get complex settings-wise.  
